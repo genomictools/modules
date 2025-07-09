@@ -9,7 +9,8 @@ process CONVERT {
     input:
     tuple val(cohort), val(key), val(category),
           path(file), path(index),
-          val(n_samples), val(n_variants)
+          val(n_samples), val(n_variants),
+          path(phenotype)
 
     output:
     tuple val(cohort), val(key), val(category),
@@ -26,6 +27,7 @@ process CONVERT {
         --vcf ${file} \
         --make-bed \
         --const-fid 0 \
+        --pheno ${phenotype} \
         --out ${cohort}.${key}.${category}
     """
 }
