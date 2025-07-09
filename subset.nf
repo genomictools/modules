@@ -21,7 +21,7 @@ process SUBSET {
     """
     #!/bin/bash
     # Subset cohort
-    bcftools view -R ${coordinates} -S ${samples} ${file} | \
+    bcftools view -R ${coordinates} -S ${samples} --force-samples ${file} | \
     if [ ${params.normalize} ];      then bcftools norm -m -any; fi | \
     if [ ${params.pass} ];           then bcftools view -i 'FILTER="PASS"'; fi | \
     if [ ${params.missing_as_ref} ]; then bcftools +setGT -- -t . -n 0; fi | \
