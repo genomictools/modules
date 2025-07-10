@@ -24,11 +24,12 @@ workflow summarize_sharing {
         | groupTuple(by: [0, 1])
         | combine(type_ch)
         | CLASSIFY
-        | filter { it[2] == 'variant' }
-        | splitCsv(header: true, sep: '\t')
-        | map { famid, category, type, row -> [ row.famid, row.category, row.gene, row.variant ] }
-        | distinct
-        | groupTuple(by: [0, 1, 2, 3])
+        | filter { it[2] == 'gene' }
+        | map { it.last() }
+        | collectFile
+        | splitText(keepHeader: true, limit: 3)
+        | splitCsv(header: false, sep: '\t')
+        | map { row -> [row[0], row[1], row[3], row[6]]}
         | set { shared }
 
     // Draw pedigrees
