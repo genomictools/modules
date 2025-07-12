@@ -23,15 +23,18 @@ process FILTER {
     """
     #!/bin/bash
     # Filter variants
-    bcftools view -e "MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}" ${file} | \
-    bcftools +split-vep -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'conflicting' || CLIN_SIG ~ 'benign'" | \
-    if   [ ${category} == 'Pathogenic' ]; then bcftools +split-vep -s worst -c CLIN_SIG -i "CLIN_SIG ~ 'pathogenic' || CLIN_SIG ~ 'likely_pathogenic'";
-    elif [ ${category} == 'Rare' ];       then bcftools +split-vep -s worst -c ${params.AF_COL}:Float,MAX_AF:Float -e "${params.AF_COL} > ${params.AF} || MAX_AF > ${params.AF}";
-    elif [ ${category} == 'High' ];       then bcftools +split-vep -s worst -c IMPACT,CADD_PHRED:Float -i "IMPACT='HIGH' && CADD_PHRED > ${params.CADD}";
-    elif [ ${category} == 'Damaging' ];   then bcftools +split-vep -s worst -c IMPACT,CADD_PHRED:Float -i "(IMPACT='HIGH' || IMPACT='MODERATE') && CADD_PHRED > ${params.CADD}";
-    elif [ ${category} == 'PTV' ];        then bcftools +split-vep -s worst -c Consequence -i "Consequence~'stop_gained' || Consequence~'frameshift_variant' || Consequence~'splice_acceptor_variant'";
-    elif [ ${category} == 'Stop' ];       then bcftools +split-vep -s worst -c Consequence -i "Consequence~'stop_gained'";
-    elif [ ${category} == 'Splicing' ];   then bcftools +split-vep -s worst -c SpliceAI_pred_DS_AG:Float,SpliceAI_pred_DS_AL:Float,SpliceAI_pred_DS_DG:Float,SpliceAI_pred_DS_DL:Float -i "SpliceAI_pred_DS_AG > ${params.DS} || SpliceAI_pred_DS_AL > ${params.DS} || SpliceAI_pred_DS_DG > ${params.DS} || SpliceAI_pred_DS_DL > ${params.DS}";
+    bcftools view ${file} | \
+    if   [ "${params.remove_common}" = "true" ];      then bcftools view -e "MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}"; else bcftools view; fi | \
+    if   [ "${params.remove_benign}" = "true" ];      then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'benign'"; else bcftools view; fi | \
+    if   [ '${params.remove_conflicting}' = 'true' ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'conflicting'"; else bcftools view ; fi | \
+    if   [ "${params.freq_tag}" = "VEP"  ] && [ "${category}" = "Rare" ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c ${params.AF_COL}:Float,MAX_AF:Float -e "${params.AF_COL} > ${params.AF} || MAX_AF > ${params.AF}";
+    elif [ "${params.freq_tag}" = "INFO" ] && [ "${category}" = "Rare" ]; then bcftools filter -e "${params.AF_COL} > ${params.AF}";
+    elif [ "${category}" = "Pathogenic" ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -i "CLIN_SIG ~ 'pathogenic' || CLIN_SIG ~ 'likely_pathogenic'";
+    elif [ "${category}" = "High" ];       then bcftools +split-vep -a ${params.vep_tag} -s worst -c IMPACT,CADD_PHRED:Float -i "IMPACT='HIGH' && CADD_PHRED > ${params.CADD}";
+    elif [ "${category}" = "Damaging" ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c IMPACT,CADD_PHRED:Float -i "(IMPACT='HIGH' || IMPACT='MODERATE') && CADD_PHRED > ${params.CADD}";
+    elif [ "${category}" = "PTV" ];        then bcftools +split-vep -a ${params.vep_tag} -s worst -c Consequence -i "Consequence~'stop_gained' || Consequence~'frameshift_variant' || Consequence~'splice_acceptor_variant'";
+    elif [ "${category}" = "Stop" ];       then bcftools +split-vep -a ${params.vep_tag} -s worst -c Consequence -i "Consequence~'stop_gained'";
+    elif [ "${category}" = "Splicing" ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c SpliceAI_pred_DS_AG:Float,SpliceAI_pred_DS_AL:Float,SpliceAI_pred_DS_DG:Float,SpliceAI_pred_DS_DL:Float -i "SpliceAI_pred_DS_AG > ${params.DS} || SpliceAI_pred_DS_AL > ${params.DS} || SpliceAI_pred_DS_DG > ${params.DS} || SpliceAI_pred_DS_DL > ${params.DS}";
     else exit "Category: ${category} is not recognized"; fi | \
     bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
     bcftools view --threads ${task.cpus} -Oz -o ${cohort}.${key}.${category}.vcf.gz
