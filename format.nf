@@ -59,6 +59,25 @@ process FORMAT {
         tr '|' '\\t' \
         >> ${cohort}.${assembly}.${tool}.${version}.tsv
         """
+    } else if ( params.tool == "alphagenome" ) {
+        """
+        #!/bin/bash
+        # Format AlphaGenome to TSV
+        echo -e "VARIANT|variant_id|scored_interval|gene_id|gene_name|gene_type|gene_strand|junction_Start|junction_End|output_type|variant_scorer|track_name|track_strand|Assay title|ontology_curie|biosample_name|biosample_type|transcription_factor|histone_mark|gtex_tissue|raw_score|quantile_score" | \
+        tr '|' '\\t' \
+        > ${cohort}.${assembly}.${tool}.${version}.tsv
+        
+        bcftools query -f '%CHROM:%POS:%REF:%ALT;%AlphaGenome\n' ${file} | \
+        awk -F';' '{
+            n = split(\$2, arr, ",")
+            for (i = 1; i <= n; i++) {
+                print \$1 ";" arr[i]
+            }
+        }' | \
+        tr ';' '\\t' | \
+        tr '|' '\\t' \
+        >> ${cohort}.${assembly}.${tool}.${version}.tsv
+        """
     } else {
         error "Unsupported tool: ${params.tool}"
     }
