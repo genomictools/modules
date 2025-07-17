@@ -18,40 +18,41 @@ process RESHAPE {
     script:
     """
     #!/bin/bash
-	# Extract uniq varaints
-    tail -n +2 ${file} | \
-	cut -f 1 -d '|' | \
-	sort -u | \
-	tr ':' '\t' \
-	> chr_pos.tsv
+	# Create header file
+	echo "##INFO=<ID=AlphaGenome,Number=.,Type=String,Description=\"AlphaGenome predictions. Format: \$(head -1 ${file} | cut -f 6- | tr '\t' '|')\">" > header.txt
+
+	# Convert to VCF format
+	bcftools convert \
+		-c CHROM,POS,REF,ALT,ID \
+		--tsv2vcf ${file} \
+		-f ${params.fasta} | \
+	bcftools norm -d none \
+		--threads ${task.cpus} \
+		-Oz -o ${species}.${tool}.${version}.${id}.variants.vcf.gz
+	tabix ${species}.${tool}.${version}.${id}.variants.vcf.gz
 
 	# Extract AlphaGenome scores
     tail -n +2 ${file} | \
-	awk -F'|' '{split(\$1, v, ":"); print v[1] "\t" v[2] "\t" v[3] "\t" v[4] "\t" \$0}' | \
+	sed 's/, /\\//g' | \
+	sed 's/ /\\_/g' | \
+	awk '{
+		printf "%s\t%s\t%s\t%s\t%s\t", \$1, \$2, \$3, \$4, \$5;
+		for(i=6;i<=NF;i++) {
+			printf "%s%s", \$i, (i<NF ? "|" : "\\n")
+		}
+	}' | \
 	sort -k1,1 -k2,2n | \
-	bgzip -c > anno.tsv.gz
+	bgzip -c > ${species}.${tool}.${version}.${id}.annotations.tsv.gz
     
-	tabix -s1 -b2 -e2 anno.tsv.gz
-    
-	# Convert to VCF format
-	bcftools convert \
-		-c CHROM,POS,REF,ALT \
-		--tsv2vcf chr_pos.tsv \
-		-f ${params.fasta} \
-		--threads ${task.cpus} \
-        -Oz -o tmp.vcf.gz
-    
-	# Create header file
-	echo "##INFO=<ID=AlphaGenome,Number=.,Type=String,Description=\"AlphaGenome predictions. Format: \$(head -n 1 ${file})\">" > header.txt
-	
+	tabix -s1 -b2 -e2 ${species}.${tool}.${version}.${id}.annotations.tsv.gz
+
 	# Annotate VCF
 	bcftools annotate \
-		-a anno.tsv.gz \
 		-h header.txt \
-		-c CHROM,POS,REF,ALT,AlphaGenome \
-		-I %CHROM:%POS:%REF:%ALT \
+		-a ${species}.${tool}.${version}.${id}.annotations.tsv.gz \
+		-c CHROM,POS,REF,ALT,ID,AlphaGenome \
 		--merge-logic AlphaGenome:unique \
-		tmp.vcf.gz \
+		${species}.${tool}.${version}.${id}.variants.vcf.gz \
 		--threads ${task.cpus} \
 		-Oz -o ${species}.${tool}.${version}.${id}.scores.vcf.gz
 

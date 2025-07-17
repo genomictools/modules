@@ -12,7 +12,7 @@ process ALPHAGENOME {
     output:
     tuple val("${params.species}"), val("${params.tool}"), val("${params.version}"),
           val(id),
-          path("${params.species}.${params.tool}.${params.version}.${id}.scores.csv")
+          path("${params.species}.${params.tool}.${params.version}.${id}.scores.tsv")
     
     secret 'API_KEY'
     // nextflow secret set API_KEY <api_key>
@@ -25,6 +25,6 @@ process ALPHAGENOME {
         --vcf_file ${file} \
         --organism ${params.species} \
         --sequence_length ${params.distance} \
-        --output ${params.species}.${params.tool}.${params.version}.${id}.scores.csv
+        --output ${params.species}.${params.tool}.${params.version}.${id}.scores.tsv
     """
 }
