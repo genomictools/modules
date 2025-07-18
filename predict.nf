@@ -1,5 +1,5 @@
 process PREDICT {
-    tag "${cohort}:${variant}:${ontology}:${assay}:${sequence_length}"
+    tag "${cohort}:${variant}:${organism}:${ontology}:${assay}:${sequence_length}"
 
     label 'simple'
     label 'alphagenome'
@@ -7,13 +7,13 @@ process PREDICT {
     publishDir("${params.output_dir}/predictions", mode: 'copy')
 
     input:
-    tuple val(cohort), val(variant), val(ontology), val(assay), val(sequence_length)
+    tuple val(cohort), val(variant), val(organism), val(ontology), val(assay), val(sequence_length)
 
     output:
-    tuple val(cohort), val(variant), val(ontology), val(assay), val(sequence_length),
-          path("${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.reference.txt"),
-          path("${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.alternate.txt"),
-          path("${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.status.txt")
+    tuple val(cohort), val(variant), val(organism), val(ontology), val(assay), val(sequence_length),
+          path("${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.reference.txt"),
+          path("${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.alternate.txt"),
+          path("${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.status.txt")
     
     secret 'API_KEY'
     // nextflow secret set API_KEY <api_key>
@@ -27,8 +27,8 @@ process PREDICT {
         --ontology ${ontology} \
         --assay ${assay} \
         --sequence_length ${sequence_length} \
-        --reference ${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.reference.txt \
-        --alternate ${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.alternate.txt \
-        --status ${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.status.txt
+        --reference ${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.reference.txt \
+        --alternate ${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.alternate.txt \
+        --status ${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.status.txt
     """
 }

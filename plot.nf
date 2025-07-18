@@ -1,5 +1,5 @@
 process PLOT {
-    tag "${cohort}:${variant}:${ontology}:${assay}:${sequence_length}"
+    tag "${cohort}:${variant}:${organism}:${ontology}:${assay}:${sequence_length}"
 
     label 'simple'
     label 'alphagenome'
@@ -7,13 +7,13 @@ process PLOT {
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
     input:
-    tuple val(cohort), val(variant), val(ontology), val(assay), val(sequence_length),
+    tuple val(cohort), val(variant), val(organism), val(ontology), val(assay), val(sequence_length),
           path(reference), path(alternate), path(status)
 
     output:
-    tuple val(cohort), val(variant), val(ontology), val(assay), val(sequence_length),
-          path("${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.plot.png")
-    
+    tuple val(cohort), val(variant), val(organism), val(ontology), val(assay), val(sequence_length),
+          path("${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.plot.png")
+
     secret 'API_KEY'
     // nextflow secret set API_KEY <api_key>
 
@@ -25,6 +25,6 @@ process PLOT {
         --assay ${assay} \
         --reference ${reference} \
         --alternate ${alternate} \
-        --plot ${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.plot.png
+        --plot ${cohort}.${variant}.${organism}.${ontology}.${assay}.${sequence_length}.plot.png
     """
 }
