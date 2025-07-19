@@ -22,9 +22,12 @@ process PLOT {
     #!/bin/bash
     plot_variant.py \
         --variant ${variant} \
+        --ontology ${ontology} \
         --assay ${assay} \
+        --sequence_length ${sequence_length} \
         --reference ${reference} \
         --alternate ${alternate} \
+        --gtf ${params.gtf} \
         --plot ${cohort}.${variant}.${ontology}.${assay}.${sequence_length}.plot.png
     """
 }
