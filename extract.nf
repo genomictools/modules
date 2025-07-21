@@ -15,7 +15,10 @@ process EXTRACT {
     script:
     """
     # Extract variants
-	bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t%ID\t%TYPE\n' ${file} > ${cohort}.variants.tsv
+    bcftools view ${file} | \
+    if [ ${params.normalize} ];        then bcftools norm -m -any; fi | \
+    if [ ${params.remove_ambiguous} ]; then bcftools view -e 'ALT="*"' ; fi | \
+	bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t%ID\t%TYPE\n' > ${cohort}.variants.tsv
     """
 }
 
