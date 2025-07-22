@@ -7,7 +7,7 @@ process COORDINATES {
     publishDir("${params.output_dir}/coordiantes", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(chrom), val(start), val(end)
+    tuple val(cohort), val(key), val(chrom), val(start), val(end), path(genelist)
     val(genome)
     val(style)
 
@@ -17,6 +17,6 @@ process COORDINATES {
     script:
     """
     #!/bin/bash
-    generate_coordinates.R ${chrom} ${start} ${end} ${genome} ${style} ${params.coding} ${params.chunk} ${key}.bed
+    generate_coordinates.R ${chrom} ${start} ${end} ${genelist} ${genome} ${style} ${params.coding} ${params.chunk} ${key}.bed
     """
 }
