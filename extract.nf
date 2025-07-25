@@ -42,6 +42,16 @@ process EXTRACT {
 		#!/bin/bash
         plink --bfile ${bim.baseName} --freq  --out ${cohort}.${key}.${category}.extracted  --nonfounders --within <(awk '{print \$1, \$2, \$6 }' ${fam})
 		"""
+	} else if ( variable == 'frq.cc' ) {
+		"""
+		#!/bin/bash
+        plink --bfile ${bim.baseName} --freq case-control --out ${cohort}.${key}.${category}.extracted
+		"""
+	} else if ( variable == 'frq.counts' ) {
+		"""
+		#!/bin/bash
+        plink --bfile ${bim.baseName} --freq counts --out ${cohort}.${key}.${category}.extracted --allow-no-sex
+		"""
     } else {
 		println "Variable ${variable} not recognized"
 	}
