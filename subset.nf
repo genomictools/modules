@@ -7,7 +7,7 @@ process SUBSET {
     publishDir("${params.output_dir}/subsets", mode: 'copy')
 
     input:
-    tuple val(cohort), path(file), path(index), path(samples),
+    tuple val(cohort), path(file), path(index), path(pedigree),
           val(key), path(coordinates)
 
     output:
@@ -20,8 +20,11 @@ process SUBSET {
     script:
     """
     #!/bin/bash
+    # Get sample names from pedigree file
+    awk '{print \$1"_"\$2}' ${pedigree} > samples.txt
+
     # Subset cohort
-    bcftools view -R ${coordinates} -S ${samples} --force-samples ${file} | \
+    bcftools view -R ${coordinates} -S samples.txt --force-samples ${file} | \
     if [ ${params.normalize} ];      then bcftools norm -m -any; fi | \
     if [ ${params.pass} ];           then bcftools view -i 'FILTER="PASS"'; fi | \
     if [ ${params.missing_as_ref} ]; then bcftools +setGT -- -t . -n 0; fi | \

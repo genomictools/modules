@@ -26,8 +26,7 @@ process CONVERT {
     plink \
         --vcf ${file} \
         --make-bed \
-        --const-fid 0 \
-        --pheno ${phenotype} \
+        --pheno <(awk '{print \$1, \$2, \$6}' ${phenotype}) \
         --out ${cohort}.${key}.${category}
     """
 }
