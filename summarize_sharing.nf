@@ -27,17 +27,18 @@ workflow summarize_sharing {
         | filter { it[2] == 'gene' }
         | map { it.last() }
         | collectFile
-        | splitText(keepHeader: true, limit: 3)
+        | splitText(keepHeader: true)
         | splitCsv(header: false, sep: '\t')
         | map { row -> [row[0], row[1], row[3], row[6]]}
         | set { shared }
-
+    shared | take(3) | view
     // Draw pedigrees
     if ( params.draw ) {
         variants
             | combine(family, by: 0)
             | ATTACH
             | combine(shared, by: [0, 1])
+            | take(3)
             | DRAW
     }
 
@@ -48,13 +49,13 @@ workflow summarize_sharing {
 workflow  {
     family_ch = Channel.fromPath(params.cohorts)
         | splitCsv(header: true, sep: ',')
-        | map { row -> [ row.famid, file(row.cases), file(row.ped)] }
+        | map { row -> [ row.famid, file(row.cases), file(row.pedigree)] }
         | unique
 
     variants_ch = Channel.fromPath(params.cohorts)
         | splitCsv(header: true, sep: ',')
         | map { row -> [
-            row.famid, row.category, file(row.snplist), file(row.rlist), file(row.freq), file(row.annotation)
+            row.famid, row.category, file(row.rlist), file(row.annotation)
         ] }
 
     blacklist_ch = Channel.fromPath(params.blacklist)
