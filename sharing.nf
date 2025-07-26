@@ -7,10 +7,9 @@ process SHARING {
     publishDir("${params.output_dir}/sharing", mode: 'copy')
 
     input:
-    tuple val(famid), val(category),
-          path(snplist), path(rlist), path(freq), path(annotation),
-          path(cases), path(ped), path(blacklist)
-            
+    tuple val(famid), val(category), path(rlist), path(annotation),
+          path(cases), path(pedigree), path(blacklist)
+
     output:
     tuple val(famid), val(category),
           path("${famid}.${category}.tsv")
@@ -18,6 +17,6 @@ process SHARING {
     script:
     """
     #!/bin/bash
-    sharing.R ${famid} ${category} ${snplist} ${rlist} ${freq} ${annotation} ${cases} ${ped} ${blacklist}
+    sharing.R ${famid} ${category} ${rlist} ${annotation} ${cases} ${pedigree} ${blacklist}
     """
 }
