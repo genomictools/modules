@@ -1,5 +1,5 @@
 process COORDINATES {
-    tag "${key}:${genome}:${style}"
+    tag "${key}:${genelist.simpleName}:${genome}:${style}"
 
     label 'simple'
     label 'bioconductor'
@@ -12,11 +12,11 @@ process COORDINATES {
     val(style)
 
     output:
-    tuple val(cohort), val("${key}"), path("${key}.bed")
+    tuple val(cohort), val("${key}"), path("${key}.${genelist.simpleName}.bed")
 
     script:
     """
     #!/bin/bash
-    generate_coordinates.R ${chrom} ${start} ${end} ${genelist} ${genome} ${style} ${params.coding} ${params.chunk} ${key}.bed
+    generate_coordinates.R ${chrom} ${start} ${end} ${genelist} ${genome} ${style} ${params.coding} ${params.chunk} ${key}.${genelist.simpleName}.bed
     """
 }
