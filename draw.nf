@@ -18,6 +18,6 @@ process DRAW {
     script:
     """
     #!/bin/bash
-    draw.R ${famid} ${category} ${pedigree} ${affected} ${carrier} ${gene} ${variant}
+    draw.R ${famid} ${category} ${pedigree} ${affected} ${carrier} ${gene} ${variant.join(',')}
     """
 }
