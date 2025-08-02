@@ -8,7 +8,7 @@ process DRAW {
 
     input:
     tuple val(famid), val(category),
-          path(pedigree), path(affected), path(carrier),
+          path(pedigree), path(affected), path(carrier), path(starred),
           val(gene), val(variant)
 
     output:
@@ -18,6 +18,6 @@ process DRAW {
     script:
     """
     #!/bin/bash
-    draw.R ${famid} ${category} ${pedigree} ${affected} ${carrier} ${gene} ${variant.join(',')}
+    draw.R ${famid} ${category} ${pedigree} ${affected} ${carrier} ${starred} ${gene} ${variant.join(',')}
     """
 }

@@ -14,7 +14,8 @@ process ATTACH {
     tuple val(famid), val(category),
           path("${famid}.${category}.marked.ped"),
           path("${famid}.aff.txt"),
-          path("${famid}.carr.txt")
+          path("${famid}.carr.txt"),
+          path("${famid}.star.txt")
 
     script:
     """
