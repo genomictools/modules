@@ -14,6 +14,7 @@ workflow summarize_sharing {
     variants
     family
     blacklist
+    to_draw
     
     main:
     // Extract variants stats
@@ -24,21 +25,14 @@ workflow summarize_sharing {
         | groupTuple(by: [0, 1])
         | combine(type_ch)
         | CLASSIFY
-        | filter { it[2] == 'gene' }
-        | map { it.last() }
-        | collectFile
-        | splitText(keepHeader: true)
-        | splitCsv(header: false, sep: '\t')
-        | map { row -> [row[0], row[1], row[3], row[6]]}
         | set { shared }
-    shared | take(3) | view
+
     // Draw pedigrees
     if ( params.draw ) {
         variants
             | combine(family, by: 0)
             | ATTACH
-            | combine(shared, by: [0, 1])
-            | take(3)
+            | combine(to_draw, by: 0)
             | DRAW
     }
 
@@ -60,5 +54,14 @@ workflow  {
 
     blacklist_ch = Channel.fromPath(params.blacklist)
 
-    summarize_genes( variants_ch, family_ch, blacklist_ch )
+    if ( params.draw ) {
+    to_draw = Channel.fromPath(params.draw_genes)
+        | splitCsv(header: true, sep: ',')
+        | map { row -> [ row.famid, row.gene, row.variant ] }
+        | groupTuple(by: [0, 1])
+    } else {
+    to_draw = Channel.empty()
+    }
+
+    summarize_genes( variants_ch, family_ch, blacklist_ch, to_draw )
 }
