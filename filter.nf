@@ -17,6 +17,7 @@ process FILTER {
           path("${cohort}.${key}.${category}.vcf.gz"),
           path("${cohort}.${key}.${category}.vcf.gz.tbi"),
           path("${cohort}.${key}.${category}.annotations.tsv"),
+          path("${cohort}.${key}.${category}.qc.tsv"),
           env(n_samples), env(n_variants)
         
     script:
@@ -51,7 +52,12 @@ process FILTER {
 		-d -A tab \
 		${cohort}.${key}.${category}.vcf.gz \
 		>> ${cohort}.${key}.${category}.annotations.tsv
-
+    
+    # Extract allele depth
+    bcftools query -f '[%CHROM:%POS:%REF:%ALT\t%SAMPLE\t%GT\t%AD\n]' \
+    ${cohort}.${key}.${category}.vcf.gz \
+	> ${cohort}.${key}.${category}.qc.tsv
+    
     # Count the number of samples and variants
     n_samples=\$(bcftools  query -l ${cohort}.${key}.${category}.vcf.gz | wc -l)
     n_variants=\$(bcftools index -n ${cohort}.${key}.${category}.vcf.gz)
