@@ -1,35 +1,33 @@
 process CONVERT {
-    tag "${cohort}:${key}"
+    tag "${cohort}:${key}:${category}"
 
     label 'simple'
     label 'plink'
 
-    publishDir("${params.output_dir}/converted", mode: 'copy')
+    publishDir("${params.output_dir}/plinked", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(vcf), path(index), path(samples)
+    tuple val(cohort), val(key), val(category),
+          path(file), path(index),
+          val(n_samples), val(n_variants),
+          path(phenotype)
 
     output:
-    tuple val(cohort), val(key),
-          path("${cohort}.${key}.bim"), 
-          path("${cohort}.${key}.bed"), 
-          path("${cohort}.${key}.fam"), 
-          path("${cohort}.${key}.log")
+    tuple val(cohort), val(key), val(category),
+          path("${cohort}.${key}.${category}.bim"),
+          path("${cohort}.${key}.${category}.bed"),
+          path("${cohort}.${key}.${category}.fam"),
+          path("${cohort}.${key}.${category}.nosex"),
+          path("${cohort}.${key}.${category}.log")
 
     script:
     """
     #!/bin/bash
-    # Extract phenotypes
-    cat ${samples} | awk '{print \$1,\$2,\$4 }' >  phenotype.tsv
-    cat ${samples} | awk '{print \$1,\$2,\$3 }'  >  sex.tsv
-
-    # Convert VCF to PLINK
     plink \
-        --vcf ${vcf} \
+        --vcf ${file} \
         --make-bed \
-        --const-fid \
-        --update-sex sex.tsv \
-        --pheno phenotype.tsv \
-        --out ${cohort}.${key}
+        --pheno <(awk '{print \$1, \$2, \$7}' ${phenotype}) \
+        --update-sex <(awk '{print \$1, \$2, \$5}' ${phenotype}) \
+        --out ${cohort}.${key}.${category}
     """
 }

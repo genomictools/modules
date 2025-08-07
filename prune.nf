@@ -1,5 +1,5 @@
 process PRUNE {
-    tag "${cohort}:${key}"
+    tag "${cohort}:${key}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,14 +7,16 @@ process PRUNE {
     publishDir("${params.output_dir}/pruned", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(bim), path(bed), path(fam), path(log)
+    tuple val(cohort), val(key), val(category),
+          path(bim), path(bed), path(fam), path(nosex), path(log)
 
     output:
-    tuple val(cohort), val(key),
-          path("${cohort}.${key}.pruned.bim"),
-          path("${cohort}.${key}.pruned.bed"),
-          path("${cohort}.${key}.pruned.fam"),
-          path("${cohort}.${key}.pruned.log")
+    tuple val(cohort), val(key), val(category),
+          path("${cohort}.${key}.${category}.pruned.bim"),
+          path("${cohort}.${key}.${category}.pruned.bed"),
+          path("${cohort}.${key}.${category}.pruned.fam"),
+          path("${cohort}.${key}.${category}.nosex"),
+          path("${cohort}.${key}.${category}.pruned.log")
 
     script:
     """
@@ -26,11 +28,11 @@ process PRUNE {
     plink --bfile ${bim.baseName} \
         --extract plink_tmp.prune.in \
         --make-bed \
-        --out ${cohort}.${key}.pruned
-    
+        --out ${cohort}.${key}.${category}.pruned
+
     # Explicitly rename output files
-    mv plink_tmp.prune.in  ${cohort}.${key}.pruned.in
-    mv plink_tmp.prune.out ${cohort}.${key}.pruned.out
+    mv plink_tmp.prune.in  ${cohort}.${key}.${category}.pruned.in
+    mv plink_tmp.prune.out ${cohort}.${key}.${category}.pruned.out
     """
 }
         // --exclude range ld_regions.bed \

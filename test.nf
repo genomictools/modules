@@ -7,10 +7,14 @@ process TEST {
     publishDir("${params.output_dir}/tests", mode: 'copy')
 
     input:
-    tuple val(cohort), path(bim), path(bed), path(fam), path(log), val(test)
+    tuple val(cohort), val(category),
+          path(bim), path(bed), path(fam), path(nosex), path(log),
+          val(test)
 
     output:
-    tuple val(cohort), val(test), path("${cohort}.${test}"), path("${cohort}.${test}.log")
+    tuple val(cohort), val(category), val(test),
+          path("${cohort}.${category}.${test}"),
+          path("${cohort}.${category}.${test}.log")
 
     script:
     """
@@ -19,8 +23,9 @@ process TEST {
     plink \
         --bfile ${bim.baseName} \
         --${test} \
+        --allow-no-sex \
         --out tmp
-    cat tmp.assoc | tr -s '\r[:blank:]' '\t' > ${cohort}.${test}
-    cat tmp.log > ${cohort}.${test}.log
+    cat tmp.assoc | tr -s '\r[:blank:]' '\t' > ${cohort}.${category}.${test}
+    cat tmp.log > ${cohort}.${category}.${test}.log
     """
 }

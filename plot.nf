@@ -7,14 +7,15 @@ process PLOT {
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
     input:
-    tuple val(cohort), val(test), path(test_file), path(test_log)
+    tuple val(cohort), val(category), val(test), path(test_file), path(test_log)
 
     output:
-    tuple val(cohort), val(test), path("${cohort}.${test}.png")
+    tuple val(cohort), val(category), val(test),
+          path("${cohort}.${category}.${test}.png")
 
     script:
     """
     #!/bin/bash
-    plot_manhattan.R ${cohort} ${test} ${test_file}
+    plot_manhattan.R ${cohort} ${category} ${test} ${test_file}
     """
 }

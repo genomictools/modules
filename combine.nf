@@ -7,14 +7,16 @@ process COMBINE {
     publishDir("${params.output_dir}/combined", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(bim), path(bed), path(fam), path(log)
+    tuple val(cohort), val(key), val(category),
+          path(bim), path(bed), path(fam), path(nosex), path(log)
 
     output:
-    tuple val(cohort),
-          path("${cohort}.bim"),
-          path("${cohort}.bed"),
-          path("${cohort}.fam"),
-          path("${cohort}.log")
+    tuple val(cohort), val(category),
+          path("${cohort}.${category}.bim"),
+          path("${cohort}.${category}.bed"),
+          path("${cohort}.${category}.fam"),
+          path("${cohort}.${category}.nosex"),
+          path("${cohort}.${category}.log")
 
     script:
     """
@@ -29,6 +31,7 @@ process COMBINE {
     plink \
         --make-bed \
         --merge-list allfiles.txt \
-        --out ${cohort}
+        --allow-no-sex \
+        --out ${cohort}.${category}
     """
 }
