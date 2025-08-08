@@ -1,5 +1,5 @@
 process PRUNE {
-    tag "${cohort}:${key}:${category}"
+    tag "${cohort}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,32 +7,24 @@ process PRUNE {
     publishDir("${params.output_dir}/pruned", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(category),
+    tuple val(cohort), val(category),
           path(bim), path(bed), path(fam), path(nosex), path(log)
 
     output:
-    tuple val(cohort), val(key), val(category),
-          path("${cohort}.${key}.${category}.pruned.bim"),
-          path("${cohort}.${key}.${category}.pruned.bed"),
-          path("${cohort}.${key}.${category}.pruned.fam"),
-          path("${cohort}.${key}.${category}.nosex"),
-          path("${cohort}.${key}.${category}.pruned.log")
+    tuple val(cohort), val(category),
+          path("${cohort}.${category}.pruned.bim"),
+          path("${cohort}.${category}.pruned.bed"),
+          path("${cohort}.${category}.pruned.fam"),
+          path("${cohort}.${category}.pruned.nosex"),
+          path("${cohort}.${category}.pruned.log")
 
     script:
     """
     #!/bin/bash        
     plink --bfile ${bim.baseName} \
         --indep-pairwise ${params.window} ${params.step} ${params.rsquared} \
-        --out plink_tmp
-    
-    plink --bfile ${bim.baseName} \
-        --extract plink_tmp.prune.in \
+        --exclude range ${params.ld_regions} \
         --make-bed \
-        --out ${cohort}.${key}.${category}.pruned
-
-    # Explicitly rename output files
-    mv plink_tmp.prune.in  ${cohort}.${key}.${category}.pruned.in
-    mv plink_tmp.prune.out ${cohort}.${key}.${category}.pruned.out
+        --out ${cohort}.${category}.pruned
     """
 }
-        // --exclude range ld_regions.bed \

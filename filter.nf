@@ -28,7 +28,9 @@ process FILTER {
         --geno ${params.geno} \
         --maf ${params.maf} \
         --hwe ${params.hwe} \
+        --allow-no-sex \
         --make-bed \
         --out ${cohort}.${category}.filtered
+    cat ${nosex} > ${cohort}.${category}.filtered.nosex
     """
 }
