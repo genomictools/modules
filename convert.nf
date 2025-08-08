@@ -10,7 +10,7 @@ process CONVERT {
     tuple val(cohort), val(key), val(category),
           path(file), path(index),
           val(n_samples), val(n_variants),
-          path(phenotype)
+          path(pedigree)
 
     output:
     tuple val(cohort), val(key), val(category),
@@ -26,8 +26,6 @@ process CONVERT {
     plink \
         --vcf ${file} \
         --make-bed \
-        --pheno <(awk '{print \$1, \$2, \$7}' ${phenotype}) \
-        --update-sex <(awk '{print \$1, \$2, \$5}' ${phenotype}) \
         --out ${cohort}.${key}.${category}
     """
 }
