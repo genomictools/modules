@@ -21,8 +21,14 @@ process SUBSET {
     """
     #!/bin/bash
     # Get sample names from pedigree file
-    awk '{print \$1"_"\$2}' ${pedigree} > samples.txt
-
+    # if family id is true, then use family_id_sample_id
+    # otherwise, use sample_id only
+    if [ ${params.family_id} ]; then
+        awk '{print \$1"_"\$2}' ${pedigree} > samples.txt
+    else
+        awk '{print \$2}' ${pedigree} > samples.txt
+    fi
+    
     # Subset cohort
     bcftools view -R ${coordinates} -S samples.txt --force-samples ${file} | \
     if [ ${params.normalize} ];      then bcftools norm -m -any; fi | \
