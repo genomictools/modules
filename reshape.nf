@@ -19,7 +19,7 @@ process RESHAPE {
     """
     #!/bin/bash
 	# Create header file
-	echo "##INFO=<ID=AlphaGenome,Number=.,Type=String,Description=\"AlphaGenome predictions. Format: \$(head -1 ${file} | cut -f 6- | tr '\t' '|')\">" > header.txt
+	echo "##INFO=<ID=${tool},Number=.,Type=String,Description=\"AlphaGenome predictions. Format: \$(head -1 ${file} | cut -f 6- | tr '\t' '|')\">" > header.txt
 
 	# Convert to VCF format
 	bcftools convert \
@@ -50,8 +50,8 @@ process RESHAPE {
 	bcftools annotate \
 		-h header.txt \
 		-a ${species}.${tool}.${version}.${id}.annotations.tsv.gz \
-		-c CHROM,POS,REF,ALT,ID,AlphaGenome \
-		--merge-logic AlphaGenome:unique \
+		-c CHROM,POS,REF,ALT,ID,${tool} \
+		--merge-logic ${tool}:unique \
 		${species}.${tool}.${version}.${id}.variants.vcf.gz \
 		--threads ${task.cpus} \
 		-Oz -o ${species}.${tool}.${version}.${id}.scores.vcf.gz
