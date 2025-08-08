@@ -21,11 +21,19 @@ process CONVERT {
           path("${cohort}.${key}.${category}.log")
 
     script:
+    def args = []
+    if ( !params.family_ids ) { args << "--const-fid 0" }
+    def args_str = args.join(' ')
     """
     #!/bin/bash
     plink \
         --vcf ${file} \
+        --update-parents <(awk '{print \$1, \$2, \$3, \$4}') \
+        --update-sex <(awk '{print \$1, \$2, \$5}') \
+        --pheno <(awk '{print \$1, \$2, \$6}') \
         --make-bed \
-        --out ${cohort}.${key}.${category}
+        --vcf-half-call ${params.halfcalls} \
+        --out ${cohort}.${key}.${category} \
+        ${args_str}
     """
 }
