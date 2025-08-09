@@ -9,7 +9,7 @@ process DETECT {
     input:
     tuple val(key), path(file), 
           val(dbspn), val(txt), file(pfb),
-          file(hmm),
+          file(hmm), file(hmm0),
           val(type)
 
     output:
@@ -36,8 +36,8 @@ process DETECT {
             -test \
             -loh \
             -tabout \
-            -hmm hhall_0.hmm \
-            -pfb common_all.pfb \
+            -hmm ${hmm0} \
+            -pfb ${pfb} \
             ${file} \
             -log ${key}.log \
             -out ${key}.${type}

@@ -18,7 +18,7 @@ process CLEAN {
     #!/bin/bash
     clean_cnv.pl \
         combineseg \
-        --fraction 0.2 \
+        --fraction ${params.fraction} \
         --signalfile ${pfb} \
         ${cnv} \
         --output ${key}.clean.cnv

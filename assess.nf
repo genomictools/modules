@@ -26,8 +26,8 @@ process ASSESS {
     filter_cnv.pl \
         ${key}.raw.cnv \
         -qclogfile ${key}.log.txt \
-        -qclrrsd 0.35 \
-        -qcnumcnv 500 \
+        -qclrrsd ${params.qclrrsd} \
+        -qcnumcnv ${params.qcnumcnv} \
         -qcpassout ${key}.qcpass \
         -qcsumout ${key}.qcsum \
         -out ${key}.goodcnv

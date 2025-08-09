@@ -16,8 +16,8 @@ process FILTER {
     """
     #!/bin/bash
     filter_cnv.pl \
-        -numsnp 10 \
-        -length 50k \
+        -numsnp ${params.numsnp} \
+        -length ${params.length} \
         ${cnv} \
         --output ${key}.filtered.cnv
     """
