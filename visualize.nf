@@ -1,5 +1,5 @@
 process VISUALIZE {
-    tag "${key}"
+    tag "${cohort}"
 
     label 'simple'
     label 'penncnv'
@@ -7,18 +7,18 @@ process VISUALIZE {
     publishDir("${params.output_dir}/tables", mode: 'copy')
 
     input:
-    tuple val(key), path(cnv), path(annotated), val(format)
+    tuple val(cohort), path(cnv), path(annotated), val(format)
 
     output:
-    tuple val(key), path("${key}.${format}")
-        
+    tuple val(cohort), path("${cohort}.${format}")
+
     script:
     """
     #!/bin/bash
     visualize_cnv.pl \
         ${cnv} \
         -format ${format} \
-        -track "${key}" \
-        > ${key}.${format}
+        -track "${cohort}" \
+        > ${cohort}.${format}
     """
 }

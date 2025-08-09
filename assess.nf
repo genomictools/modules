@@ -1,6 +1,6 @@
 // Quality control of CNV calls
 process ASSESS {
-    tag "${key}"
+    tag "${cohort}:${key}"
 
     label 'simple'
     label 'penncnv'
@@ -8,28 +8,28 @@ process ASSESS {
     publishDir("${params.output_dir}/qc", mode: 'copy')
 
     input:
-    tuple val(key), path(signal), val(type), path(cnv), path(cnv_log)
+    tuple val(cohort), val(key), path(signal), val(type), path(cnv), path(cnv_log)
 
     output:
-    tuple val(key),
-          path("${key}.qcpass"),
-          path("${key}.qcsum"),
-          path("${key}.goodcnv")
+    tuple val(cohort), val(key),
+          path("${cohort}.${key}.qcpass"),
+          path("${cohort}.${key}.qcsum"),
+          path("${cohort}.${key}.goodcnv")
 
     script:
     """
     #!/bin/bash
-    awk '(NR == 1) || (FNR > 1)' ${signal} > ${key}.signal.txt
-    cat ${cnv} > ${key}.raw.cnv
-    cat ${cnv_log} > ${key}.log.txt
+    awk '(NR == 1) || (FNR > 1)' ${signal} > ${cohort}.${key}.signal.txt
+    cat ${cnv} > ${cohort}.${key}.raw.cnv
+    cat ${cnv_log} > ${cohort}.${key}.log.txt
 
     filter_cnv.pl \
-        ${key}.raw.cnv \
-        -qclogfile ${key}.log.txt \
+        ${cohort}.${key}.raw.cnv \
+        -qclogfile ${cohort}.${key}.log.txt \
         -qclrrsd ${params.qclrrsd} \
         -qcnumcnv ${params.qcnumcnv} \
-        -qcpassout ${key}.qcpass \
-        -qcsumout ${key}.qcsum \
-        -out ${key}.goodcnv
+        -qcpassout ${cohort}.${key}.qcpass \
+        -qcsumout ${cohort}.${key}.qcsum \
+        -out ${cohort}.${key}.goodcnv
     """
 }

@@ -1,5 +1,5 @@
 process DETECT {
-    tag "${key}"
+    tag "${cohort}:${key}"
 
     label 'simple'
     label 'penncnv'
@@ -7,16 +7,16 @@ process DETECT {
     publishDir("${params.output_dir}/${type}", mode: 'copy')
 
     input:
-    tuple val(key), path(file), 
+    tuple val(cohort), val(key), path(file), 
           val(dbspn), val(txt), file(pfb),
           file(hmm), file(hmm0),
           val(type)
 
     output:
-    tuple val(key), val(type),
-          path("${key}.${type}"),
-          path("${key}.log")
-    
+    tuple val(cohort), val(key), val(type),
+          path("${cohort}.${key}.${type}"),
+          path("${cohort}.${key}.log")
+
     script:
     if (type == 'cnv') {
         """
@@ -26,8 +26,8 @@ process DETECT {
             -hmm ${hmm} \
             -pfb ${pfb} \
             ${file} \
-            -log ${key}.log \
-            -out ${key}.${type}
+            -log ${cohort}.${key}.log \
+            -out ${cohort}.${key}.${type}
         """
     } else if (type == 'loh') {
         """
@@ -39,8 +39,8 @@ process DETECT {
             -hmm ${hmm0} \
             -pfb ${pfb} \
             ${file} \
-            -log ${key}.log \
-            -out ${key}.${type}
+            -log ${cohort}.${key}.log \
+            -out ${cohort}.${key}.${type}
         """
     } else {
         error "Unknown type: ${type}"

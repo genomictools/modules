@@ -1,5 +1,5 @@
 process EXTRACT {
-    tag "${key}"
+    tag "${cohort}:${key}"
 
     label 'simple'
     label 'penncnv'
@@ -7,15 +7,15 @@ process EXTRACT {
     publishDir("${params.output_dir}/signal", mode: 'copy')
 
     input:
-    tuple val(key), path(file)
+    tuple val(cohort), val(key), path(file)
 
     output:
-    tuple val(key), path("${key}.signal.txt")
-    
+    tuple val(cohort), val(key), path("${cohort}.${key}.signal.txt")
+
     script:
     """
     #!/bin/bash
-    echo -e "Name\tB Allele Freq\tLog R Ratio" > ${key}.signal.txt
-    cat ${file} | tail -n +13 | cut -f 1,15,16 >> ${key}.signal.txt
+    echo -e "Name\tB Allele Freq\tLog R Ratio" > ${cohort}.${key}.signal.txt
+    cat ${file} | tail -n +13 | cut -f 1,15,16 >> ${cohort}.${key}.signal.txt
     """
 }

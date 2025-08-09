@@ -1,5 +1,5 @@
 process CLEAN {
-    tag "${key}"
+    tag "${cohort}:${key}"
 
     label 'simple'
     label 'penncnv'
@@ -7,11 +7,11 @@ process CLEAN {
     publishDir("${params.output_dir}/clean", mode: 'copy')
 
     input:
-    tuple val(key), path(cnv), 
+    tuple val(cohort), val(key), path(cnv), 
           val(dbsnp), path(txt), path(pfb)
 
     output:
-    tuple val(key), path("${key}.clean.cnv")
+    tuple val(cohort), val(key), path("${cohort}.${key}.clean.cnv")
 
     script:
     """
@@ -21,6 +21,6 @@ process CLEAN {
         --fraction ${params.fraction} \
         --signalfile ${pfb} \
         ${cnv} \
-        --output ${key}.clean.cnv
+        --output ${cohort}.${key}.clean.cnv
     """
 }

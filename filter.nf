@@ -1,5 +1,5 @@
 process FILTER {
-    tag "${key}"
+    tag "${cohort}:${key}"
 
     label 'simple'
     label 'penncnv'
@@ -7,11 +7,12 @@ process FILTER {
     publishDir("${params.output_dir}/filtered", mode: 'copy')
 
     input:
-    tuple val(key), val(type), path(cnv), path(cnv_log)
+    tuple val(cohort), val(key), val(type),
+          path(cnv), path(cnv_log)
 
     output:
-    tuple val(key), path("${key}.filtered.cnv")
-          
+    tuple val(cohort), val(key), path("${cohort}.${key}.filtered.cnv")
+
     script:
     """
     #!/bin/bash
@@ -19,6 +20,6 @@ process FILTER {
         -numsnp ${params.numsnp} \
         -length ${params.length} \
         ${cnv} \
-        --output ${key}.filtered.cnv
+        --output ${cohort}.${key}.filtered.cnv
     """
 }

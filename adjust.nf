@@ -1,5 +1,5 @@
 process ADJUST {
-    tag "${key}"
+    tag "${cohort}:${key}"
 
     label 'simple'
     label 'penncnv'
@@ -7,12 +7,12 @@ process ADJUST {
     publishDir("${params.output_dir}/adjusted", mode: 'copy')
 
     input:
-    tuple val(key), path(file),
+    tuple val(cohort), val(key), path(file),
           val(dbsnp), file(gcm)
 
     output:
-    tuple val(key), path("${key}.signal.txt.adjusted")
-    
+    tuple val(cohort), val(key), path("${cohort}.${key}.signal.txt.adjusted")
+
     script:
     """
     #!/bin/bash

@@ -1,5 +1,5 @@
 process SCAN {
-    tag "${key}"
+    tag "${cohort}"
 
     label 'simple'
     label 'penncnv'
@@ -7,23 +7,23 @@ process SCAN {
     publishDir("${params.output_dir}/scanned", mode: 'copy')
 
     input:
-    tuple val(key), path(cnv), path(ref_gene), path(ref_link)   
+    tuple val(cohort), val(key), path(cnv), path(ref_gene), path(ref_link)
 
     output:
-    tuple val(key),
-          path("${key}.cnv"),
-          path("${key}.gene.cnv")
+    tuple val(cohort),
+          path("${cohort}.cnv"),
+          path("${cohort}.gene.cnv")
         
     script:
     """
     #!/bin/bash
 
-    cat ${cnv} > ${key}.cnv
+    cat ${cnv} > ${cohort}.cnv
 
     scan_region.pl \
-        ${key}.cnv \
+        ${cohort}.cnv \
         ${ref_gene} \
         -refgene -reflink ${ref_link} \
-        > ${key}.gene.cnv
+        > ${cohort}.gene.cnv
     """
 }
