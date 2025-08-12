@@ -9,7 +9,7 @@ process ASSESS {
 
     input:
     tuple val(cohort), val(key), val(type),
-          path(cnv), path(cnv_log)
+          path(cnv), path(cnv_log), val(nmarkers)
 
     output:
     tuple val(cohort), val(type),

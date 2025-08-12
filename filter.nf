@@ -8,12 +8,13 @@ process FILTER {
 
     input:
     tuple val(cohort), val(key), val(type),
-          path(cnv), path(cnv_log)
+          path(cnv), path(cnv_log), val(nmarkers)
 
     output:
     tuple val(cohort), val(key), val(type),
           path("${cohort}.${key}.filtered.${type}"),
-          path("${cohort}.${key}.filtered.${type}.log")
+          path("${cohort}.${key}.filtered.${type}.log"),
+          env(nmarkers)
 
     script:
     """
@@ -28,5 +29,7 @@ process FILTER {
         ${cnv} \
         --output ${cohort}.${key}.filtered.${type} \
         &> ${cohort}.${key}.filtered.${type}.log
+
+    nmarkers=\$(wc -l < "${cohort}.${key}.filtered.${type}")
     """
 }

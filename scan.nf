@@ -7,13 +7,14 @@ process SCAN {
     publishDir("${params.output_dir}/scanned", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(type), path(cnv), path(cnv_log),
+    tuple val(cohort), val(key), val(type), path(cnv), path(cnv_log), val(nmarkers),
           path(ref_gene), path(ref_link), val(feature)
 
     output:
     tuple val(cohort), val(feature),
           path("${cohort}.${feature}.${type}"),
-          path("${cohort}.${feature}.${type}.log")
+          path("${cohort}.${feature}.${type}.log"),
+          env(nmarkers)
 
     script:
     def args = []
@@ -30,5 +31,7 @@ process SCAN {
         -reflink ${ref_link} \
         > ${cohort}.${feature}.${type} \
         2> ${cohort}.${feature}.${type}.log
+
+    nmarkers=\$(wc -l < "${cohort}.${feature}.${type}")
     """
 }

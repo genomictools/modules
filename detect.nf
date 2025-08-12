@@ -8,7 +8,7 @@ process DETECT {
 
     input:
     tuple val(cohort), val(key), val(level),
-          path(file), path(log),
+          path(file), path(log), val(nmarkers),
           val(dbspn), val(txt), file(pfb),
           file(hmm), file(hmm0),
           val(type)
@@ -16,7 +16,8 @@ process DETECT {
     output:
     tuple val(cohort), val(key), val(type),
           path("${cohort}.${key}.${type}"),
-          path("${cohort}.${key}.${type}.log")
+          path("${cohort}.${key}.${type}.log"),
+          env(nmarkers)
 
     script:
     def args = []
@@ -36,6 +37,8 @@ process DETECT {
             ${file} \
             -log ${cohort}.${key}.${type}.log \
             -out ${cohort}.${key}.${type}
+
+        nmarkers=\$(wc -l < "${cohort}.${key}.${type}")
         """
     } else if (type == 'loh') {
         """
@@ -49,6 +52,8 @@ process DETECT {
             ${file} \
             -log ${cohort}.${key}.${type}.log \
             -out ${cohort}.${key}.${type}
+
+        nmarkers=\$(wc -l < "${cohort}.${key}.${type}")
         """
     } else {
         error "Unknown type: ${type}"

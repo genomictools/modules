@@ -12,7 +12,8 @@ process EXTRACT {
     output:
     tuple val(cohort), val(key), val('raw'),
           path("${cohort}.${key}.data.txt"),
-          path("${cohort}.${key}.data.log")
+          path("${cohort}.${key}.data.log"),
+          env(nmarkers)
 
     script:
     """
@@ -34,5 +35,7 @@ process EXTRACT {
         print \$1, \$15, \$16 > "${cohort}.${key}.data.txt"
     }
     ' ${file}
+
+    nmarkers=\$(wc -l < "${cohort}.${key}.data.txt")
     """
 }
