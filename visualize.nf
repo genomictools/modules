@@ -1,5 +1,5 @@
 process VISUALIZE {
-    tag "${cohort}"
+    tag "${cohort}:${feature}:${format}"
 
     label 'simple'
     label 'penncnv'
@@ -12,8 +12,8 @@ process VISUALIZE {
 
     output:
     tuple val(cohort), val(feature),
-          path("${cohort}.${format}"),
-          path("${cohort}.${format}.log")
+          path("${cohort}.${feature}.${format}"),
+          path("${cohort}.${feature}.${format}.log")
 
     script:
     """
@@ -22,7 +22,7 @@ process VISUALIZE {
         ${cnv} \
         -format ${format} \
         -track "${cohort}" \
-        > ${cohort}.${format} \
-        &> ${cohort}.${format}.log
+        > ${cohort}.${feature}.${format} \
+        2> ${cohort}.${feature}.${format}.log
     """
 }

@@ -1,5 +1,5 @@
 process FILTER {
-    tag "${cohort}:${key}"
+    tag "${cohort}:${key}:${type}"
 
     label 'simple'
     label 'penncnv'

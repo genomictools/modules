@@ -1,5 +1,5 @@
 process SCAN {
-    tag "${cohort}:${feature}"
+    tag "${cohort}:${feature}:${type}"
 
     label 'simple'
     label 'penncnv'
@@ -16,31 +16,19 @@ process SCAN {
           path("${cohort}.${feature}.${type}.log")
 
     script:
-    if (feature == 'gene') {
-        """
-        #!/bin/bash
-        scan_region.pl \
-            <(cat ${cnv}) \
-            ${ref_gene} \
-            -refgene -reflink ${ref_link} \
-            > ${cohort}.${feature}.${type} \
-            2> ${cohort}.${feature}.${type}.log
-        """
-    } else if (feature == 'exon') {
-        """
-        #!/bin/bash
-        scan_region.pl \
-            <(cat ${cnv}) \
-            ${ref_gene} \
-            -refexon -reflink ${ref_link} \
-            > ${cohort}.${feature}.${type} \
-            2> ${cohort}.${feature}.${type}.log
-        """
-    } else {
-        """
-        #!/bin/bash
-        cat ${cnv} > ${cohort}.${feature}.${type} \
-            2> ${cohort}.${feature}.${type}.log
-        """
-    }
+    def args = []
+    if ( feature == 'gene' ) { args << "-refgene" }
+    if ( feature == 'exon' ) { args << "-refexon" }
+    def args_str = args.join(' ')
+
+    """
+    #!/bin/bash
+    scan_region.pl \
+        <(cat ${cnv}) \
+        ${ref_gene} \
+        ${args_str} \
+        -reflink ${ref_link} \
+        > ${cohort}.${feature}.${type} \
+        2> ${cohort}.${feature}.${type}.log
+    """
 }
