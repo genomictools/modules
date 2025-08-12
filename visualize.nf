@@ -7,10 +7,10 @@ process VISUALIZE {
     publishDir("${params.output_dir}/tables", mode: 'copy')
 
     input:
-    tuple val(cohort), path(cnv), path(annotated), val(format)
+    tuple val(cohort), val(feature), path(cnv), val(format)
 
     output:
-    tuple val(cohort), path("${cohort}.${format}")
+    tuple val(cohort), val(feature), path("${cohort}.${format}")
 
     script:
     """
