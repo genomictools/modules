@@ -19,8 +19,12 @@ process FILTER {
     """
     #!/bin/bash
     filter_cnv.pl \
-        -numsnp ${params.numsnp} \
-        -length ${params.length} \
+        --numsnp ${params.numsnp} \
+ 	    --maxnumsnp ${params.maxnumsnp} \
+        --length ${params.length} \
+ 	    --maxlength ${params.maxlength} \
+ 	    --confidence ${params.confidence} \
+ 	    --maxconfidence ${params.maxconfidence} \
         ${cnv} \
         --output ${cohort}.${key}.filtered.${type} \
         &> ${cohort}.${key}.filtered.${type}.log

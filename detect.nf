@@ -18,6 +18,11 @@ process DETECT {
           path("${cohort}.${key}.${type}.log")
 
     script:
+    def args = []
+    if ( params.sex_file   != null ) { args << "--sexfile ${params.sex_file}" }
+    if ( params.pheno_file != null ) { args << "--phenofile ${params.pheno_file} --cctest" }
+    def args_str = args.join(' ')
+
     if (type == 'cnv') {
         """
         #!/bin/bash
@@ -25,6 +30,8 @@ process DETECT {
             -test \
             -hmm ${hmm} \
             -pfb ${pfb} \
+            --confidence \
+            ${args_str} \
             ${file} \
             -log ${cohort}.${key}.${type}.log \
             -out ${cohort}.${key}.${type}

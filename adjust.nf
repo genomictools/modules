@@ -8,7 +8,7 @@ process ADJUST {
 
     input:
     tuple val(cohort), val(key), path(file), path(log),
-          val(dbsnp), file(gcm)
+          val(dbsnp), file(gcm), file(gcm_log)
 
     output:
     tuple val(cohort), val(key),
@@ -20,7 +20,8 @@ process ADJUST {
     #!/bin/bash
     genomic_wave.pl \
         -adjust \
-        -gcmodel ${gcm} \
+        -gcmodelfile ${gcm} \
+        -distance ${params.distance} \
         ${file} \
         &> ${cohort}.${key}.adjusted.log
     """
