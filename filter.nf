@@ -11,7 +11,9 @@ process FILTER {
           path(cnv), path(cnv_log)
 
     output:
-    tuple val(cohort), val(key), path("${cohort}.${key}.filtered.cnv")
+    tuple val(cohort), val(key), val(type),
+          path("${cohort}.${key}.filtered.${type}"),
+          path("${cohort}.${key}.filtered.${type}.log")
 
     script:
     """
@@ -20,6 +22,7 @@ process FILTER {
         -numsnp ${params.numsnp} \
         -length ${params.length} \
         ${cnv} \
-        --output ${cohort}.${key}.filtered.cnv
+        --output ${cohort}.${key}.filtered.${type} \
+        &> ${cohort}.${key}.filtered.${type}.log
     """
 }

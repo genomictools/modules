@@ -7,10 +7,13 @@ process VISUALIZE {
     publishDir("${params.output_dir}/tables", mode: 'copy')
 
     input:
-    tuple val(cohort), val(feature), path(cnv), val(format)
+    tuple val(cohort), val(feature), path(cnv), path(cnv_log),
+          val(format)
 
     output:
-    tuple val(cohort), val(feature), path("${cohort}.${format}")
+    tuple val(cohort), val(feature),
+          path("${cohort}.${format}"),
+          path("${cohort}.${format}.log")
 
     script:
     """
@@ -19,6 +22,7 @@ process VISUALIZE {
         ${cnv} \
         -format ${format} \
         -track "${cohort}" \
-        > ${cohort}.${format}
+        > ${cohort}.${format} \
+        &> ${cohort}.${format}.log
     """
 }

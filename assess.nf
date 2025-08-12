@@ -8,28 +8,27 @@ process ASSESS {
     publishDir("${params.output_dir}/qc", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(signal), val(type), path(cnv), path(cnv_log)
+    tuple val(cohort), val(key), path(signal), path(signal_log),
+          val(type), path(cnv), path(cnv_log)
 
     output:
     tuple val(cohort), val(key),
           path("${cohort}.${key}.qcpass"),
           path("${cohort}.${key}.qcsum"),
-          path("${cohort}.${key}.goodcnv")
+          path("${cohort}.${key}.goodcnv"),
+          path("${cohort}.${key}.qc.log")
 
     script:
     """
     #!/bin/bash
-    awk '(NR == 1) || (FNR > 1)' ${signal} > ${cohort}.${key}.signal.txt
-    cat ${cnv} > ${cohort}.${key}.raw.cnv
-    cat ${cnv_log} > ${cohort}.${key}.log.txt
-
     filter_cnv.pl \
-        ${cohort}.${key}.raw.cnv \
-        -qclogfile ${cohort}.${key}.log.txt \
+        <(cat ${cnv}) \
+        -qclogfile <(cat ${cnv_log}) \
         -qclrrsd ${params.qclrrsd} \
         -qcnumcnv ${params.qcnumcnv} \
         -qcpassout ${cohort}.${key}.qcpass \
         -qcsumout ${cohort}.${key}.qcsum \
-        -out ${cohort}.${key}.goodcnv
+        -out ${cohort}.${key}.goodcnv \
+        &> ${cohort}.${key}.qc.log
     """
 }

@@ -7,11 +7,13 @@ process CLEAN {
     publishDir("${params.output_dir}/clean", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(cnv), 
+    tuple val(cohort), val(key), val(type), path(cnv), path(cnv_log),
           val(dbsnp), path(txt), path(pfb)
 
     output:
-    tuple val(cohort), val(key), path("${cohort}.${key}.clean.cnv")
+    tuple val(cohort), val(key), val(type),
+          path("${cohort}.${key}.clean.${type}"),
+          path("${cohort}.${key}.clean.${type}.log")
 
     script:
     """
@@ -21,6 +23,7 @@ process CLEAN {
         --fraction ${params.fraction} \
         --signalfile ${pfb} \
         ${cnv} \
-        --output ${cohort}.${key}.clean.cnv
+        --output ${cohort}.${key}.clean.${type} \
+        &> ${cohort}.${key}.clean.${type}.log
     """
 }
