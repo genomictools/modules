@@ -10,7 +10,7 @@ process EXTRACT {
     tuple val(cohort), val(key), path(file)
 
     output:
-    tuple val(cohort), val(key), 
+    tuple val(cohort), val(key), val('raw'),
           path("${cohort}.${key}.data.txt"),
           path("${cohort}.${key}.data.log")
 

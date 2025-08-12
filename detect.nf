@@ -1,5 +1,5 @@
 process DETECT {
-    tag "${cohort}:${key}:${type}"
+    tag "${cohort}:${key}:${level}:${type}"
 
     label 'simple'
     label 'penncnv'
@@ -7,7 +7,8 @@ process DETECT {
     publishDir("${params.output_dir}/${type}", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(file), path(log),
+    tuple val(cohort), val(key), val(level),
+          path(file), path(log),
           val(dbspn), val(txt), file(pfb),
           file(hmm), file(hmm0),
           val(type)

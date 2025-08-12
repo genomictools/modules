@@ -7,11 +7,12 @@ process ADJUST {
     publishDir("${params.output_dir}/adjusted", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), path(file), path(log),
+    tuple val(cohort), val(key), val(level),
+          path(file), path(log),
           val(dbsnp), file(gcm), file(gcm_log)
 
     output:
-    tuple val(cohort), val(key),
+    tuple val(cohort), val(key), val('adjusted'),
           path("${cohort}.${key}.data.txt.adjusted"),
           path("${cohort}.${key}.adjusted.log")
 
