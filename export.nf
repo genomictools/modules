@@ -1,4 +1,4 @@
-process VISUALIZE {
+process EXPORT {
     tag "${cohort}:${feature}:${format}"
 
     label 'simple'
@@ -13,8 +13,7 @@ process VISUALIZE {
     output:
     tuple val(cohort), val(feature),
           path("${cohort}.${feature}.${format}"),
-          path("${cohort}.${feature}.${format}.log"),
-          env(nmarkers)
+          path("${cohort}.${feature}.${format}.log")
 
     script:
     """
@@ -25,7 +24,5 @@ process VISUALIZE {
         -track "${cohort}" \
         > ${cohort}.${feature}.${format} \
         2> ${cohort}.${feature}.${format}.log
-
-    nmarkers=\$(wc -l < "${cohort}.${feature}.${format}")
     """
 }
