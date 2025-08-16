@@ -2,7 +2,7 @@ process PLOT {
     tag "${cohort}:${feature}:${plot_type}"
 
     label 'simple'
-    label 'cnvranger'
+    label 'cnvr'
 
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
