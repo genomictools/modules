@@ -22,17 +22,17 @@ process PLOT {
     if ( plot_type == 'heatmap') {
         """
         #!/bin/bash
-        heatmap.R ${cohort} ${feature} ${cnv} ${plot_type} 1 1 2> ${cohort}.${feature}.${plot_type}.log
+        heatmap.R ${cohort} ${feature} ${cnv} ${plot_type} ${params.n_samples} ${params.n_genes} 2> ${cohort}.${feature}.${plot_type}.log
         """
     } else if ( plot_type == 'lrr' ) {
         """
         #!/bin/bash
-        scatter.R ${cnv} ${signal.join(',')} ${pfb} ${plot_type} ${params.flank} ${params.top_n} 2> ${cohort}.${feature}.${plot_type}.log
+        scatter.R ${cnv} ${signal.join(',')} ${pfb} ${plot_type} ${params.flank} ${params.n_genes} 2> ${cohort}.${feature}.${plot_type}.log
         """
     } else if ( plot_type == 'baf' ) {
         """
         #!/bin/bash
-        scatter.R ${cnv} ${signal.join(',')} ${pfb} ${plot_type} ${params.flank} ${params.top_n} 2> ${cohort}.${feature}.${plot_type}.log
+        scatter.R ${cnv} ${signal.join(',')} ${pfb} ${plot_type} ${params.flank} ${params.n_genes} 2> ${cohort}.${feature}.${plot_type}.log
         """
     } else {
         printl("Unknown plot type: ${plot_type}")
