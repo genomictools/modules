@@ -11,7 +11,7 @@ process SCAN {
           path(ref_gene), path(ref_link), val(feature)
 
     output:
-    tuple val(cohort), val(feature),
+    tuple val(cohort), val(feature), val(type),
           path("${cohort}.${feature}.${type}"),
           path("${cohort}.${feature}.${type}.log"),
           env(nmarkers)
