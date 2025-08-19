@@ -1,5 +1,5 @@
 process CLEAN {
-    tag "${cohort}:${key}:${type}"
+    tag "${cohort}:${type}"
 
     label 'simple'
     label 'penncnv'
