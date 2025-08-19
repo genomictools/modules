@@ -7,7 +7,7 @@ process SCAN {
     publishDir("${params.output_dir}/scanned", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(type), path(cnv), path(cnv_log), val(nmarkers),
+    tuple val(cohort), val(type), path(cnv), path(cnv_log), val(nmarkers),
           path(ref_gene), path(ref_link), val(feature)
 
     output:
@@ -25,7 +25,7 @@ process SCAN {
     """
     #!/bin/bash
     scan_region.pl \
-        <(cat ${cnv}) \
+        ${cnv} \
         ${ref_gene} \
         ${args_str} \
         -reflink ${ref_link} \
