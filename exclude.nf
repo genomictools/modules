@@ -1,5 +1,5 @@
 process EXCLUDE {
-    tag "${cohort}:${key}:${type}"
+    tag "${cohort}:${type}"
 
     label 'simple'
     label 'penncnv'
@@ -7,14 +7,14 @@ process EXCLUDE {
     publishDir("${params.output_dir}/excluded", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(type),
+    tuple val(cohort), val(type),
           path(cnv), path(cnv_log), val(nmarkers),
           path(exclude)
 
     output:
-    tuple val(cohort), val(key), val(type),
-          path("${cohort}.${key}.excluded.${type}"),
-          path("${cohort}.${key}.excluded.${type}.log"),
+    tuple val(cohort), val(type),
+          path("${cohort}.excluded.${type}"),
+          path("${cohort}.excluded.${type}.log"),
           env(nmarkers)
 
     script:
@@ -26,11 +26,11 @@ process EXCLUDE {
         ${exclude} \
         -minqueryfrac 0.5 \
         > to_remove.txt \
-        &> ${cohort}.${key}.excluded.${type}.log
+        &> ${cohort}.excluded.${type}.log
     
     # exclude regions
-    fgrep -v -f to_remove.txt ${cnv} > ${cohort}.${key}.excluded.${type}
+    fgrep -v -f to_remove.txt ${cnv} > ${cohort}.excluded.${type}
     
-    nmarkers=\$(wc -l < "${cohort}.${key}.excluded.${type}")
+    nmarkers=\$(wc -l < "${cohort}.excluded.${type}")
     """
 }

@@ -7,13 +7,14 @@ process CLEAN {
     publishDir("${params.output_dir}/clean", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(type), path(cnv), path(cnv_log), val(nmarkers),
+    tuple val(cohort), val(type), 
+          path(cnv), path(cnv_log), val(nmarkers),
           val(dbsnp), path(txt), path(pfb)
 
     output:
-    tuple val(cohort), val(key), val(type),
-          path("${cohort}.${key}.clean.${type}"),
-          path("${cohort}.${key}.clean.${type}.log"),
+    tuple val(cohort), val(type),
+          path("${cohort}.clean.${type}"),
+          path("${cohort}.clean.${type}.log"),
           env(nmarkers)
 
     script:
@@ -24,9 +25,9 @@ process CLEAN {
         --fraction ${params.fraction} \
         --signalfile ${pfb} \
         ${cnv} \
-        --output ${cohort}.${key}.clean.${type} \
-        &> ${cohort}.${key}.clean.${type}.log
+        --output ${cohort}.clean.${type} \
+        &> ${cohort}.clean.${type}.log
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.clean.${type}")
+    nmarkers=\$(wc -l < "${cohort}.clean.${type}")
     """
 }
