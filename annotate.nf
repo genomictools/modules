@@ -1,10 +1,10 @@
-process SCAN {
+process ANNOTATE {
     tag "${cohort}:${feature}:${type}"
 
     label 'simple'
     label 'penncnv'
 
-    publishDir("${params.output_dir}/scanned", mode: 'copy')
+    publishDir("${params.output_dir}/annotated", mode: 'copy')
 
     input:
     tuple val(cohort), val(type), path(cnv), path(cnv_log), val(nmarkers),
