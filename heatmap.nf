@@ -4,7 +4,7 @@ process HEATMAP {
     label 'simple'
     label 'cnvr'
 
-    publishDir("${params.output_dir}/plots", mode: 'copy')
+    publishDir("${params.output_dir}/heatmaps", mode: 'copy')
 
     input:
     tuple val(cohort), val(feature), val(type),
