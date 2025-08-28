@@ -1,5 +1,5 @@
 process EXPORT {
-    tag "${cohort}:${feature}:${type}:${format}"
+    tag "${cohort}:${tool}:${feature}:${type}:${format}"
 
     label 'simple'
     label 'penncnv'
@@ -7,14 +7,14 @@ process EXPORT {
     publishDir("${params.output_dir}/tables", mode: 'copy')
 
     input:
-    tuple val(cohort), val(feature), val(type),
+    tuple val(cohort), val(tool), val(feature), val(type),
           path(cnv), path(cnv_log), val(nmarkers),
           val(format)
 
     output:
-    tuple val(cohort), val(feature), val(type),
-          path("${cohort}.${feature}.${type}.${format}"),
-          path("${cohort}.${feature}.${type}.${format}.log")
+    tuple val(cohort), val(tool), val(feature), val(type),
+          path("${cohort}.${tool}.${feature}.${type}.${format}"),
+          path("${cohort}.${tool}.${feature}.${type}.${format}.log")
 
     script:
     """
@@ -23,7 +23,7 @@ process EXPORT {
         ${cnv} \
         -format ${format} \
         -track "${cohort}" \
-        > ${cohort}.${feature}.${type}.${format} \
-        2> ${cohort}.${feature}.${type}.${format}.log
+        > ${cohort}.${tool}.${feature}.${type}.${format} \
+        2> ${cohort}.${tool}.${feature}.${type}.${format}.log
     """
 }

@@ -1,5 +1,5 @@
 process CLEAN {
-    tag "${cohort}:${type}"
+    tag "${cohort}:${tool}:${type}"
 
     label 'simple'
     label 'penncnv'
@@ -7,14 +7,14 @@ process CLEAN {
     publishDir("${params.output_dir}/clean", mode: 'copy')
 
     input:
-    tuple val(cohort), val(type), 
+    tuple val(cohort), val(tool), val(type),
           path(cnv), path(cnv_log), val(nmarkers),
           val(dbsnp), path(txt), path(pfb)
 
     output:
-    tuple val(cohort), val(type),
-          path("${cohort}.clean.${type}"),
-          path("${cohort}.clean.${type}.log"),
+    tuple val(cohort), val(tool), val(type),
+          path("${cohort}.${tool}.clean.${type}"),
+          path("${cohort}.${tool}.clean.${type}.log"),
           env(nmarkers)
 
     script:
@@ -25,9 +25,9 @@ process CLEAN {
         --fraction ${params.fraction} \
         --signalfile ${pfb} \
         ${cnv} \
-        --output ${cohort}.clean.${type} \
-        &> ${cohort}.clean.${type}.log
+        --output ${cohort}.${tool}.clean.${type} \
+        &> ${cohort}.${tool}.clean.${type}.log
 
-    nmarkers=\$(wc -l < "${cohort}.clean.${type}")
+    nmarkers=\$(wc -l < "${cohort}.${tool}.clean.${type}")
     """
 }

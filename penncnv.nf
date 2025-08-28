@@ -1,22 +1,22 @@
-process DETECT {
-    tag "${cohort}:${key}:${level}:${type}"
+process PENNCNV {
+    tag "${cohort}:${key}:${tool}:${type}"
 
     label 'simple'
     label 'penncnv'
 
-    publishDir("${params.output_dir}/${type}", mode: 'copy')
+    publishDir("${params.output_dir}/${tool}", mode: 'copy')
 
     input:
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers),
-          val(type), file(hmm),
+          val(tool), val(type), file(hmm),
           val(dbspn), val(txt), file(pfb)
           
 
     output:
-    tuple val(cohort), val(key), val(type),
-          path("${cohort}.${key}.${type}"),
-          path("${cohort}.${key}.${type}.log"),
+    tuple val(cohort), val(key), val(tool), val(type),
+          path("${cohort}.${key}.${tool}.${type}"),
+          path("${cohort}.${key}.${tool}.${type}.log"),
           env(nmarkers)
 
     script:
@@ -33,9 +33,9 @@ process DETECT {
         -pfb ${pfb} \
         --confidence \
         ${file} \
-        -log ${cohort}.${key}.${type}.log \
-        -out ${cohort}.${key}.${type}
+        -log ${cohort}.${key}.${tool}.${type}.log \
+        -out ${cohort}.${key}.${tool}.${type}
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.${type}")
+    nmarkers=\$(wc -l < "${cohort}.${key}.${tool}.${type}")
     """
 }

@@ -1,5 +1,5 @@
 process ANNOTATE {
-    tag "${cohort}:${feature}:${type}"
+    tag "${cohort}:${tool}:${feature}:${type}"
 
     label 'simple'
     label 'penncnv'
@@ -7,13 +7,15 @@ process ANNOTATE {
     publishDir("${params.output_dir}/annotated", mode: 'copy')
 
     input:
-    tuple val(cohort), val(type), path(cnv), path(cnv_log), val(nmarkers),
+    tuple val(cohort), val(tool), val(type),
+          path(cnv), path(cnv_log),
+          env(nmarkers),
           path(ref_gene), path(ref_link), val(feature)
 
     output:
-    tuple val(cohort), val(feature), val(type),
-          path("${cohort}.${feature}.${type}"),
-          path("${cohort}.${feature}.${type}.log"),
+    tuple val(cohort), val(tool), val(feature), val(type),
+          path("${cohort}.${tool}.${feature}.${type}"),
+          path("${cohort}.${tool}.${feature}.${type}.log"),
           env(nmarkers)
 
     script:
@@ -29,9 +31,9 @@ process ANNOTATE {
         ${ref_gene} \
         ${args_str} \
         -reflink ${ref_link} \
-        > ${cohort}.${feature}.${type} \
-        2> ${cohort}.${feature}.${type}.log
+        > ${cohort}.${tool}.${feature}.${type} \
+        2> ${cohort}.${tool}.${feature}.${type}.log
 
-    nmarkers=\$(wc -l < "${cohort}.${feature}.${type}")
+    nmarkers=\$(wc -l < "${cohort}.${tool}.${feature}.${type}")
     """
 }
