@@ -1,5 +1,5 @@
 process RGADA {
-    tag "${cohort}:${key}:${tool}:${type}"
+    tag "${cohort}:${key}:${tool}"
 
     label 'simple'
     label 'rgada'
@@ -9,27 +9,23 @@ process RGADA {
     input:
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers),
-          val(tool), val(type)
+          val(tool)
           
 
     output:
-    tuple val(cohort), val(key), val(tool), val(type),
-          path("${cohort}.${key}.${tool}.${type}"),
-          path("${cohort}.${key}.${tool}.${type}.log"),
+    tuple val(cohort), val(key), val(tool), val("cnv,loh"),
+          path("${cohort}.${key}.${tool}.{cnv,loh}"),
+          path("${cohort}.${key}.${tool}.log"),
           env(nmarkers)
 
     script:
     """
     #!/bin/bash
-    RGadaIndividual.R \
-        --input ${file} \
-        --output ${cohort}.${key}.${tool}.${type} \
-        --t_statistic ${params.t_statistic} \
-        --a_alpha ${params.a_alpha} \
-        --min_seg_length ${params.min_seg_length} \
-        >& ${cohort}.${key}.${tool}.${type}.log
+    # Call GADA
+    RGadaIndividual.R  ${file} ${params.a_alpha} ${params.t_statistic} ${params.min_seg_length} ${cohort}.${key}.${tool} >& ${cohort}.${key}.${tool}.log
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.${tool}.${type}")
-    """
+    # Count the number of markers
+	nmarkers="\$(wc -l < "${cohort}.${key}.${tool}.cnv"),\$(wc -l < "${cohort}.${key}.${tool}.loh")"
+	"""
 }
 
