@@ -11,9 +11,7 @@ process DEEPMVP {
 
     output:
     tuple val("${params.assembly}"), val("${params.tool}"), val("${params.version}"), val(id),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.header.txt"),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz"),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz.tbi"),
+          path("${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv"),
           env(n_variants)
 
     script:
@@ -35,20 +33,10 @@ process DEEPMVP {
         -t 1 \
         -o .
 
-    # Create header file
-	echo "##INFO=<ID=${params.tool},Number=.,Type=String,Description=\"Format: \$(head -1 deepmvp-mutation_impact.tsv | tr '\t' '|')\">" > ${params.assembly}.${params.tool}.${params.version}.${id}.header.txt
+    # Rename file
+    cat deepmvp-mutation_impact.tsv > ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv
 
-    # Format output
-    cat deepmvp-mutation_impact.tsv | \
-    awk 'BEGIN{OFS="\t"} NR==1{print "CHROM","POS","REF","ALT",\$0; next} {split(\$1,a,":"); print a[1],a[2],a[3],a[4],\$0}' | \
-    tail -n +2 | \
-    sort -k1,1 -k2,2n | \
-	bgzip -c > ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz
-    
-    # Index the output
-	tabix -s1 -b2 -e2 ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz
-    
     # Count the number of variants
-    n_variants=\$(zcat ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz | wc -l)
+    n_variants=\$(cat ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv | wc -l)
     """
 }

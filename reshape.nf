@@ -7,14 +7,14 @@ process RESHAPE {
     publishDir("${params.output_dir}/annotations/${tool}", mode: 'copy')
 
     input:
-    tuple val(species), val(tool), val(version),
-		  val(id), path(header), path(file), path(index),
+    tuple val(assembly), val(tool), val(version), val(id),
+		  path(file), path(index),
 		  val(n_variants)
 
     output:
-    tuple val(species), val(tool), val(version), val(id),
-          path("${species}.${tool}.${version}.${id}.annotated.vcf.gz"),
-          path("${species}.${tool}.${version}.${id}.annotated.vcf.gz.tbi")
+    tuple val(assembly), val(tool), val(version), val(id),
+          path("${assembly}.${tool}.${version}.${id}.annotated.vcf.gz"),
+          path("${assembly}.${tool}.${version}.${id}.annotated.vcf.gz.tbi")
 
     script:
     """
@@ -27,10 +27,10 @@ process RESHAPE {
 	bcftools annotate \
 		-a ${file} \
 		-c CHROM,POS,REF,ALT,ID,${tool} \
-		-h ${header} \
+		-h <(zcat ${file} | head -1) \
 		--merge-logic ${tool}:unique \
 		--threads ${task.cpus} \
-		-Oz -o ${species}.${tool}.${version}.${id}.annotated.vcf.gz
-	tabix ${species}.${tool}.${version}.${id}.annotated.vcf.gz 
+		-Oz -o ${assembly}.${tool}.${version}.${id}.annotated.vcf.gz
+	tabix ${assembly}.${tool}.${version}.${id}.annotated.vcf.gz
     """
 }
