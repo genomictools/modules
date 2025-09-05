@@ -17,14 +17,14 @@ process FORMAT {
           env(n_variants)
 
     script:
-    if ( tool == 'deepmvp' ) {
+    if ( tool == 'deepmvp' || tool == 'alphagenome' ) {
         """
         #!/bin/bash
         # Create header file
         echo "##INFO=<ID=${tool},Number=.,Type=String,Description=\"Format: \$(head -1 ${file} | tr '\t' '|')\">" | bgzip -c > ${assembly}.${tool}.${version}.${id}.scores.tsv.gz
 
         # Format output
-        cat ${file} | \
+        head ${file} | \
         awk 'BEGIN{OFS="\t"} 
         NR==1 {
             info_col = \$1
@@ -33,20 +33,20 @@ process FORMAT {
             next                  
         }
         {
-            split(\$1,a,":")
+            split(\$1,a,":|>")
             merged = \$1
             for(i=2;i<=NF;i++) merged = merged "|" \$i
             print a[1],a[2],\$1,a[3],a[4],merged
         }' | \
         tail -n +2 | \
         sort -k1,1 -k2,2n | \
-        bgzip -c >> ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz
-        
+        bgzip -c >> ${assembly}.${tool}.${version}.${id}.scores.tsv.gz
+
         # Index the output
-        tabix -s1 -b2 -e2 ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz
-        
+        tabix -s1 -b2 -e2 ${assembly}.${tool}.${version}.${id}.scores.tsv.gz
+
         # Count the number of variants
-        n_variants=\$(zcat ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv.gz | wc -l)
+        n_variants=\$(zcat ${assembly}.${tool}.${version}.${id}.scores.tsv.gz | wc -l)
         """
     } else {
         println "Tool ${tool} not supported in FORMAT module"
