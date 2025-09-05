@@ -1,4 +1,4 @@
-process RESHAPE2 {
+process RESHAPE {
     tag "${params.species}:${params.tool}:${params.version}:${id}"
 
     label 'simple'
