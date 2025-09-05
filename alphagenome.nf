@@ -11,9 +11,7 @@ process ALPHAGENOME {
 
     output:
     tuple val("${params.species}"), val("${params.tool}"), val("${params.version}"), val(id),
-          path("${params.species}.${params.tool}.${params.version}.${id}.header.txt"),
-          path("${params.species}.${params.tool}.${params.version}.${id}.scores.tsv.gz"),
-          path("${params.species}.${params.tool}.${params.version}.${id}.scores.tsv.gz.tbi"),
+          path("${params.species}.${params.tool}.${params.version}.${id}.scores.tsv"),
           env(n_variants)
     
     secret 'API_KEY'
@@ -27,19 +25,9 @@ process ALPHAGENOME {
         --vcf_file ${file} \
         --organism ${params.species} \
         --sequence_length ${params.distance} \
-        --output output.tsv
-
-    # Create header file
-    echo "##INFO=<ID=${params.tool},Number=.,Type=String,Description=\"Format: \$(head -1 output.tsv | tr '\t' '|')\">" > ${params.species}.${params.tool}.${params.version}.${id}.header.txt
-
-	# Extract AlphaGenome scores
-    tail -n +2 output.tsv | \
-	sort -k1,1 -k2,2n | \
-	bgzip -c > ${params.species}.${params.tool}.${params.version}.${id}.scores.tsv.gz
-    
-	tabix -s1 -b2 -e2 ${params.species}.${params.tool}.${params.version}.${id}.scores.tsv.gz
+        --output ${params.species}.${params.tool}.${params.version}.${id}.scores.tsv
 
     # Count the number of variants
-    n_variants=\$(zcat ${params.species}.${params.tool}.${params.version}.${id}.scores.tsv.gz | wc -l)
+    n_variants=\$(cat ${params.species}.${params.tool}.${params.version}.${id}.scores.tsv | wc -l)
     """
 }

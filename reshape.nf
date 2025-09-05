@@ -22,11 +22,11 @@ process RESHAPE {
 	# Convert to VCF format
 	bcftools convert \
 		--tsv2vcf ${file} \
-		-c CHROM,POS,REF,ALT,ID \
+		-c CHROM,POS,ID,REF,ALT \
 		-f ${params.fasta} | \
 	bcftools annotate \
 		-a ${file} \
-		-c CHROM,POS,REF,ALT,ID,${tool} \
+		-c CHROM,POS,ID,REF,ALT,${tool} \
 		-h <(zcat ${file} | head -1) \
 		--merge-logic ${tool}:unique \
 		--threads ${task.cpus} \
