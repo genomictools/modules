@@ -24,7 +24,7 @@ process FORMAT {
         echo "##INFO=<ID=${tool},Number=.,Type=String,Description=\"Format: \$(head -1 ${file} | tr '\t' '|')\">" | bgzip -c > ${assembly}.${tool}.${version}.${id}.scores.tsv.gz
 
         # Format output
-        head ${file} | \
+        cat ${file} | \
         awk 'BEGIN{OFS="\t"} 
         NR==1 {
             info_col = \$1
