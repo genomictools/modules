@@ -9,11 +9,13 @@ process CNVR {
     input:
     tuple val(cohort), val(tool), val(type),
           path(cnv), path(cnv_log),
-          val(nmarkers)
+          val(nmarkers),
+		  val(cohort_size)
 
     output:
-    tuple val(cohort), val(tool), val(type),
-          path("${cohort}.cnvr.bed"),
+    tuple val(cohort), val(type),
+          path("${cohort}.cnvr.tsv"),
+          path("${cohort}.candidates.tsv"),
           path("${cohort}.cnvr.log"),
           env(nmarkers)
 
@@ -21,7 +23,8 @@ process CNVR {
     """
     #!/bin/bash
     # Create cnvr
-    cnvr.R ${cohort} ${tool.join(',')} ${cnv.join(',')} ${params.overlap} ${cohort}.cnvr.bed 2> ${cohort}.cnvr.log
-    nmarkers=\$(wc -l < "${cohort}.cnvr.bed")
+    cnvr.R ${cohort} ${tool.join(',')} ${cnv.join(',')} ${params.overlap} ${cohort_size} 2> ${cohort}.cnvr.log
+
+    nmarkers=\$(wc -l < "${cohort}.cnvr.tsv")
     """
 }
