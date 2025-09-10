@@ -7,9 +7,7 @@ process FAMILY {
     publishDir("${params.output_dir}/tests", mode: 'copy')
 
     input:
-    tuple val(cohort), val(tool), val(type),
-          path(cnv), path(cnv_log),
-          env(cnv_nmarkers),
+    tuple val(cohort), val(tool), val(type), path(cnv),
           val(test),
           file(hmm),
           val(dbsnp), path(txt), path(pfb),
