@@ -1,5 +1,5 @@
 process VEP {
-    tag "${params.assembly}:${params.tool}:${params.version}:${id}"
+    tag "${params.assembly}:${tool}:${params.version}:${id}"
 
     label 'simple'
     label 'vep'
@@ -7,13 +7,13 @@ process VEP {
     publishDir("${params.output_dir}/annotations", mode: 'copy')
 
     input:
-    tuple val(id), path(file), path(index)
+    tuple val(id), path(file), path(index), val(tool)
 
     output:
-    tuple val("${params.assembly}"), val("${params.tool}"), val("${params.version}"),
+    tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"),
           val(id),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz"),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz.tbi")
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz"),
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi")
 
     script:
     def args = []
@@ -26,7 +26,7 @@ process VEP {
     #!/bin/bash
     vep \
         -i ${file} \
-        -o ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz \
+        -o ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz \
         --species ${params.species} \
         --assembly ${params.assembly} \
         --cache_version ${params.version} \
@@ -41,6 +41,6 @@ process VEP {
         --fork ${task.cpus} \
         ${args_str}
 
-    tabix ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz
+    tabix ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz
     """
 }

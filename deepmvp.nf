@@ -1,17 +1,17 @@
 process DEEPMVP {
-    tag "${params.assembly}:${params.tool}:${params.version}:${id}"
+    tag "${params.assembly}:${tool}:${params.version}:${id}"
 
     label 'simple'
     label 'deepmvp'
 
-    publishDir("${params.output_dir}/annotations/${params.tool}", mode: 'copy')
+    publishDir("${params.output_dir}/annotations/${tool}", mode: 'copy')
 
     input:
-    tuple val(id), path(file), path(index), val(n_variants)
+    tuple val(id), path(file), path(index), val(n_variants), val(tool)
 
     output:
-    tuple val("${params.assembly}"), val("${params.tool}"), val("${params.version}"), val(id),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv"),
+    tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"), val(id),
+          path("${params.assembly}.${tool}.${params.version}.${id}.scores.tsv"),
           env(n_variants)
 
     script:
@@ -34,9 +34,9 @@ process DEEPMVP {
         -o .
 
     # Rename file
-    cat deepmvp-mutation_impact.tsv > ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv
+    cat deepmvp-mutation_impact.tsv > ${params.assembly}.${tool}.${params.version}.${id}.scores.tsv
 
     # Count the number of variants
-    n_variants=\$(cat ${params.assembly}.${params.tool}.${params.version}.${id}.scores.tsv | wc -l)
+    n_variants=\$(cat ${params.assembly}.${tool}.${params.version}.${id}.scores.tsv | wc -l)
     """
 }

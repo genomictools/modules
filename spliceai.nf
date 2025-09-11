@@ -1,5 +1,5 @@
 process SPLICEAI {
-    tag "${params.assembly}:${params.tool}:${params.version}:${id}"
+    tag "${params.assembly}:${tool}:${params.version}:${id}"
 
     label 'simple'
     label 'spliceai'
@@ -7,13 +7,13 @@ process SPLICEAI {
     publishDir("${params.output_dir}/annotations", mode: 'copy')
 
     input:
-    tuple val(id), path(file), path(index)
+    tuple val(id), path(file), path(index), val(tool)
 
     output:
-    tuple val("${params.assembly}"), val("${params.tool}"), val("${params.version}"),
+    tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"),
           val(id),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz"),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz.tbi")
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz"),
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi")
 
     script:
     def args = []
@@ -26,9 +26,9 @@ process SPLICEAI {
     #!/bin/bash
     spliceai \
         -I ${file} \
-        -O ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz \
+        -O ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz \
         ${args_str}
 
-    touch ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz.tbi
+    touch ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi
     """
 }
