@@ -13,7 +13,7 @@ process ADJUST {
 
     output:
     tuple val(cohort), val(key), val('adjusted'),
-          path("${cohort}.${key}.data.txt.adjusted"),
+          path("${cohort}.${key}.raw.txt.adjusted"),
           path("${cohort}.${key}.adjusted.log"),
           env(nmarkers)
 
@@ -27,6 +27,6 @@ process ADJUST {
         ${file} \
         &> ${cohort}.${key}.adjusted.log
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.data.txt.adjusted")
+    nmarkers=\$(wc -l < "${cohort}.${key}.raw.txt.adjusted")
     """
 }
