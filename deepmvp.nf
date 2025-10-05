@@ -12,13 +12,16 @@ process DEEPMVP {
     output:
     tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"), val(id),
           path("${params.assembly}.${tool}.${params.version}.${id}.scores.tsv"),
-          env(n_variants)
+          env(nvariants)
 
     script:
     """
     #!/bin/bash
     # Extract variants
-    bcftools view -H ${file} | cut -f 1-5 > ${id}.variants.tsv
+    bcftools view ${file} | \
+    if   [ '${params.missense_only}' = 'true' ]; then bcftools view -i "INFO/BCSQ[*] ~'missense'"; else bcftools view ; fi | \
+    bcftools view -H | \
+    cut -f 1-5 > ${id}.variants.tsv
 
     # Translate protein consequences
     python /DeepMVP/DeepMVP.py translate \
@@ -37,6 +40,6 @@ process DEEPMVP {
     cat deepmvp-mutation_impact.tsv > ${params.assembly}.${tool}.${params.version}.${id}.scores.tsv
 
     # Count the number of variants
-    n_variants=\$(cat ${params.assembly}.${tool}.${params.version}.${id}.scores.tsv | wc -l)
+    nvariants=\$(cat ${params.assembly}.${tool}.${params.version}.${id}.scores.tsv | wc -l)
     """
 }

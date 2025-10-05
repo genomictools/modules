@@ -7,10 +7,10 @@ process ANNOTATE {
     publishDir("${params.output_dir}/annotated/", mode: 'copy')
 
     input:
-    tuple val(cohort),
-          path(vcf), path(vcf_index),
+    tuple val(cohort), path(vcf), path(vcf_index),
           val(assembly), val(tool), val(version),
-          path(anno_vcf), path(anno_index)
+          path(anno_vcf), path(anno_index),
+          val(nvariants)
 
     output:
     tuple val(cohort), val(assembly), val(version),

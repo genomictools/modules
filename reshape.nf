@@ -9,12 +9,13 @@ process RESHAPE {
     input:
     tuple val(assembly), val(tool), val(version), val(id),
 		  path(file), path(index),
-		  val(n_variants)
+		  val(nvariants)
 
     output:
     tuple val(assembly), val(tool), val(version), val(id),
           path("${assembly}.${tool}.${version}.${id}.annotated.vcf.gz"),
-          path("${assembly}.${tool}.${version}.${id}.annotated.vcf.gz.tbi")
+          path("${assembly}.${tool}.${version}.${id}.annotated.vcf.gz.tbi"),
+		  env(nvariants)
 
     script:
     """
@@ -31,6 +32,9 @@ process RESHAPE {
 		--merge-logic ${tool}:unique \
 		--threads ${task.cpus} \
 		-Oz -o ${assembly}.${tool}.${version}.${id}.annotated.vcf.gz
+
 	tabix ${assembly}.${tool}.${version}.${id}.annotated.vcf.gz
+
+	nvariants=\$(bcftools index -n ${assembly}.${tool}.${version}.${id}.annotated.vcf.gz)
     """
 }

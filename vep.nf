@@ -4,16 +4,16 @@ process VEP {
     label 'simple'
     label 'vep'
 
-    publishDir("${params.output_dir}/annotations", mode: 'copy')
+    publishDir("${params.output_dir}/annotations/${tool}", mode: 'copy')
 
     input:
     tuple val(id), path(file), path(index), val(tool)
 
     output:
-    tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"),
-          val(id),
+    tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"), val(id),
           path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz"),
-          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi")
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi"),
+          env(nvariants)
 
     script:
     def args = []
@@ -42,5 +42,7 @@ process VEP {
         ${args_str}
 
     tabix ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz
+
+    nvariants=\$(zcat ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz | grep -v '^#' | wc -l)
     """
 }

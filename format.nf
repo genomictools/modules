@@ -4,17 +4,17 @@ process FORMAT {
     label 'simple'
     label 'deepmvp'
 
-    publishDir("${params.output_dir}/annotations/${params.tool}", mode: 'copy')
+    publishDir("${params.output_dir}/annotations/${tool}", mode: 'copy')
 
     input:
     tuple val(assembly), val(tool), val(version), val(id),
-          path(file), env(n_variants)
+          path(file), val(nvariants)
 
     output:
     tuple val(assembly), val(tool), val(version), val(id),
           path("${assembly}.${tool}.${version}.${id}.scores.tsv.gz"),
           path("${assembly}.${tool}.${version}.${id}.scores.tsv.gz.tbi"),
-          env(n_variants)
+          env(nvariants)
 
     script:
     if ( tool == 'deepmvp' || tool == 'alphagenome' ) {
@@ -46,7 +46,7 @@ process FORMAT {
         tabix -s1 -b2 -e2 ${assembly}.${tool}.${version}.${id}.scores.tsv.gz
 
         # Count the number of variants
-        n_variants=\$(zcat ${assembly}.${tool}.${version}.${id}.scores.tsv.gz | wc -l)
+        nvariants=\$(zcat ${assembly}.${tool}.${version}.${id}.scores.tsv.gz | wc -l)
         """
     } else {
         println "Tool ${tool} not supported in FORMAT module"

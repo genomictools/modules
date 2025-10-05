@@ -4,17 +4,18 @@ process CONCATINATE {
     label 'simple'
     label 'bcftools'
 
-
-    publishDir("${params.output_dir}/concatinated/", mode: 'copy')
+    publishDir("${params.output_dir}/annotations/${tool}", mode: 'copy')
 
     input:
-    tuple val(assembly), val(tool), val(version), 
-          val(id), path(file), path(index)
+    tuple val(assembly), val(tool), val(version), val(id),
+          path(file), path(index),
+          val(nvariants)
 
     output:
     tuple val(assembly), val(tool), val(version), 
           path("${assembly}.${tool}.${version}.vcf.gz"),
-          path("${assembly}.${tool}.${version}.vcf.gz.tbi")
+          path("${assembly}.${tool}.${version}.vcf.gz.tbi"),
+          env(nvariants)
 
     script:
     """
@@ -27,5 +28,7 @@ process CONCATINATE {
         -Oz -o ${assembly}.${tool}.${version}.vcf.gz
 
     tabix ${assembly}.${tool}.${version}.vcf.gz
+
+    nvariants=\$(bcftools index -n ${assembly}.${tool}.${version}.vcf.gz)
     """
 }
