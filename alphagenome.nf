@@ -24,7 +24,7 @@ process ALPHAGENOME {
         --api_key \$API_KEY \
         --vcf_file ${file} \
         --organism ${params.species} \
-        --sequence_length ${params.distance} \
+        --sequence_length ${params.seq_length} \
         --output ${params.species}.${tool}.${params.version}.${id}.scores.tsv
 
     # Count the number of variants

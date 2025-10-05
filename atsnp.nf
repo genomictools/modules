@@ -11,18 +11,13 @@ process ATSNP {
 
     output:
     tuple val("${params.species}"), val("${tool}"), val("${params.version}"), val(id),
-          path("${params.species}.${tool}.${params.version}.${id}.scores.tsv.gz"),
-          path("${params.species}.${tool}.${params.version}.${id}.scores.tsv.gz.tbi"),
+          path("${params.species}.${tool}.${params.version}.${id}.scores.tsv"),
           env(nvariants)
 
     script:
     """
     #!/bin/bash
-    atsnp.R ${file} ${params.motifs} ${params.species}.${tool}.${params.version}.${id}.scores.tsv
-
-    bgzip -c ${params.species}.${tool}.${params.version}.${id}.scores.tsv > ${params.species}.${tool}.${params.version}.${id}.scores.tsv.gz
-    tabix -s1 -b2 -e2 ${params.species}.${tool}.${params.version}.${id}.scores.tsv.gz
-    
+    atsnp.R ${file} ${params.motifs} ${params.species}.${tool}.${params.version}.${id}.scores.tsv    
     nvariants=\$(cat ${params.species}.${tool}.${params.version}.${id}.scores.tsv | wc -l)
     """
 }

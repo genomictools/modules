@@ -17,7 +17,7 @@ process FORMAT {
           env(nvariants)
 
     script:
-    if ( tool == 'deepmvp' || tool == 'alphagenome' ) {
+    if ( tool == 'deepmvp' || tool == 'alphagenome' || tool == 'atsnp') {
         """
         #!/bin/bash
         # Create header file

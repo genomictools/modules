@@ -1,5 +1,5 @@
 process PANGOLIN {
-    tag "${params.assembly}:${params.tool}:${params.version}:${id}"
+    tag "${params.assembly}:${tool}:${params.version}:${id}"
 
     label 'simple'
     label 'pangolin'
@@ -10,9 +10,9 @@ process PANGOLIN {
     tuple val(id), path(file), path(index), val(tool)
 
     output:
-    tuple val("${params.assembly}"), val("${params.tool}"), val("${params.version}"), val(id),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz"),
-          path("${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz.tbi"),
+    tuple val("${params.assembly}"), val("${tool}"), val("${params.version}"), val(id),
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz"),
+          path("${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi"),
           env(nvariants)
 
     script:
@@ -27,11 +27,11 @@ process PANGOLIN {
         ${file} \
         ${params.fasta} \
         ${params.annotation} \
-        ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz \
+        ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz \
         ${args_str}
 
-    touch ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz.tbi
+    touch ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz.tbi
 
-    nvariants=\$(zcat ${params.assembly}.${params.tool}.${params.version}.${id}.vcf.gz | grep -v '^#' | wc -l)
+    nvariants=\$(zcat ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz | grep -v '^#' | wc -l)
     """
 }

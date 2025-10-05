@@ -1,5 +1,5 @@
 process RESHAPE {
-    tag "${params.species}:${params.tool}:${params.version}:${id}"
+    tag "${params.species}:${tool}:${params.version}:${id}"
 
     label 'simple'
     label 'bcftools'

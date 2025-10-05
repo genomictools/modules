@@ -1,5 +1,5 @@
 process CSQ {
-    tag "${params.assembly}:${params.tool}:${params.version}:${id}"
+    tag "${params.assembly}:${tool}:${params.version}:${id}"
 
     label 'simple'
     label 'bcftools'

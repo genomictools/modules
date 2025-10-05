@@ -20,6 +20,7 @@ process VEP {
     if ( params.cadd )     { args << "--plugin CADD,snv=${params.cadd_snv},indels=${params.cadd_indel}" }
     if ( params.spliceai ) { args << "--plugin SpliceAI,snv=${params.spliceai_snv},indel=${params.spliceai_indel}" }
     if ( params.gnomad )   { args << "--custom ${params.gnomad_file},gnomAD,vcf,exact,0,AF" }
+    if ( params.species == 'human' )   { args << "--species homo_sapiens" } else { args << "--species ${params.species}" }
     def args_str = args.join(' ')
 
     """
@@ -27,7 +28,6 @@ process VEP {
     vep \
         -i ${file} \
         -o ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz \
-        --species ${params.species} \
         --assembly ${params.assembly} \
         --cache_version ${params.version} \
         --dir_cache ${params.vep_cache} \
