@@ -1,4 +1,4 @@
-process COMBINE {
+process MERGE {
     tag "${cohort}"
 
     label 'max'
