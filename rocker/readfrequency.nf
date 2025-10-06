@@ -1,4 +1,4 @@
-process READ {
+process READFREQUENCY {
     tag "${cohort}:${category}"
 
     label 'simple'

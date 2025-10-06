@@ -1,4 +1,4 @@
-process TEST {
+process BURDENTEST {
     tag "${category}:${case_cohort}:${cont_cohort}:${model}"
 
     label 'simple'
