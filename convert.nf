@@ -28,9 +28,9 @@ process CONVERT {
     #!/bin/bash
     plink \
         --vcf ${file} \
-        --update-parents <(awk '{print \$1, \$2, \$3, \$4}') \
-        --update-sex <(awk '{print \$1, \$2, \$5}') \
-        --pheno <(awk '{print \$1, \$2, \$6}') \
+        --update-parents <(awk '{print \$1, \$2, \$3, \$4}' ${pedigree}) \
+        --update-sex <(awk '{print \$1, \$2, \$5}' ${pedigree}) \
+        --pheno <(awk '{print \$1, \$2, \$6}' ${pedigree}) \
         --make-bed \
         --vcf-half-call ${params.halfcalls} \
         --out ${cohort}.${key}.${category} \
