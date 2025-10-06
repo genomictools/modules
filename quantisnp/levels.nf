@@ -2,6 +2,7 @@ process LEVELS {
     tag "${tool}"
 
     label 'simple'
+    label 'quantisnp'
 
     publishDir("${params.output_dir}/ref", mode: 'copy')
 

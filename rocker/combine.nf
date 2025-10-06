@@ -2,7 +2,7 @@ process COMBINE {
     tag "${cohort}:${tool}:${type}"
 
     label 'simple'
-    label 'penncnv'
+    label 'rocker'
 
     publishDir("${params.output_dir}/combined", mode: 'copy')
 
