@@ -2,6 +2,7 @@ process SUMMARIZE {
     tag "${cohort}:${key}:${category}"
 
     label 'simple'
+    label 'rocker'
 
     publishDir("${params.output_dir}/summary", mode: 'copy')
 
