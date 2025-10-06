@@ -17,7 +17,7 @@ process ATSNP {
     script:
     """
     #!/bin/bash
-    atsnp/atsnp.R ${file} ${params.motifs} ${params.species}.${tool}.${params.version}.${id}.scores.tsv    
+    call_atsnp.R ${file} ${params.motifs} ${params.species}.${tool}.${params.version}.${id}.scores.tsv    
     nvariants=\$(cat ${params.species}.${tool}.${params.version}.${id}.scores.tsv | wc -l)
     """
 }

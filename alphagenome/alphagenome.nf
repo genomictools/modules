@@ -20,7 +20,7 @@ process ALPHAGENOME {
     script:
     """
     #!/bin/bash
-    alphagenome/alphagenome.py \
+    query_alphagenome.py \
         --api_key \$API_KEY \
         --vcf_file ${file} \
         --organism ${params.species} \
