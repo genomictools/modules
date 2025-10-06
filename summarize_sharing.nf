@@ -2,10 +2,10 @@
 
 nextflow.enable.dsl=2
 
-include { SHARING }     from '../modules/sharing.nf'
-include { CLASSIFY }    from '../modules/classify.nf'
-include { ATTACH }      from '../modules/attach.nf'
-include { DRAW }        from '../modules/draw.nf'
+include { SHARING }     from '../modules/rvs/sharing.nf'
+include { CLASSIFY }    from '../modules/rvs/classify.nf'
+include { ATTACH }      from '../modules/rvs/attach.nf'
+include { DRAW }        from '../modules/rvs/draw.nf'
 
 type_ch = Channel.of( 'variant', 'gene' )
 
