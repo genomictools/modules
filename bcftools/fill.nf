@@ -1,5 +1,5 @@
 process FILL {
-    tag "${cohort}:${key}"
+    tag "${cohort}:${type}:${key}"
 
     label 'simple'
     label 'bcftools'
@@ -7,14 +7,14 @@ process FILL {
     publishDir("${params.output_dir}/filled", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key),
+    tuple val(cohort), val(type), val(key),
           path(file), path(index),
           val(n_samples), val(n_variants)
 
     output:
-    tuple val(cohort), val(key),
-          path("${cohort}.${key}.filled.vcf.gz"),
-          path("${cohort}.${key}.filled.vcf.gz.tbi"),
+    tuple val(cohort), val(type), val(key),
+          path("${cohort}.${type}.${key}.filled.vcf.gz"),
+          path("${cohort}.${type}.${key}.filled.vcf.gz.tbi"),
           env(n_samples), env(n_variants)
 
     script:
@@ -27,10 +27,10 @@ process FILL {
     bcftools view -g het --threads ${task.cpus} -Oz -o ${cohort}.${key}.filled.vcf.gz
 
 	# Index the filled VCF
-    tabix ${cohort}.${key}.filled.vcf.gz
+    tabix ${cohort}.${type}.${key}.filled.vcf.gz
 
     # Count the number of samples and variants
-    n_samples=\$(bcftools  query -l ${cohort}.${key}.filled.vcf.gz | wc -l)
-    n_variants=\$(bcftools index -n ${cohort}.${key}.filled.vcf.gz)
+    n_samples=\$(bcftools  query -l ${cohort}.${type}.${key}.filled.vcf.gz | wc -l)
+    n_variants=\$(bcftools index -n ${cohort}.${type}.${key}.filled.vcf.gz)
     """
 }

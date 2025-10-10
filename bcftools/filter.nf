@@ -16,6 +16,7 @@ process FILTER {
     tuple val(cohort), val(key), val(category),
           path("${cohort}.${key}.${category}.vcf.gz"),
           path("${cohort}.${key}.${category}.vcf.gz.tbi"),
+          path("${cohort}.${key}.${category}.variants.txt"),
           path("${cohort}.${key}.${category}.annotations.tsv"),
           path("${cohort}.${key}.${category}.qc.tsv"),
           env(n_samples), env(n_variants)
@@ -36,9 +37,10 @@ process FILTER {
     elif [ "${category}" = "PTV" ];        then bcftools +split-vep -a ${params.vep_tag} -s worst -c Consequence -i "Consequence~'stop_gained' || Consequence~'frameshift_variant' || Consequence~'splice_acceptor_variant'";
     elif [ "${category}" = "Stop" ];       then bcftools +split-vep -a ${params.vep_tag} -s worst -c Consequence -i "Consequence~'stop_gained'";
     elif [ "${category}" = "Splicing" ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c SpliceAI_pred_DS_AG:Float,SpliceAI_pred_DS_AL:Float,SpliceAI_pred_DS_DG:Float,SpliceAI_pred_DS_DL:Float -i "SpliceAI_pred_DS_AG > ${params.DS} || SpliceAI_pred_DS_AL > ${params.DS} || SpliceAI_pred_DS_DG > ${params.DS} || SpliceAI_pred_DS_DL > ${params.DS}";
+    elif [ "${category}" = "Common" ];     then bcftools view  -i 'VC=="SNV" && SAO!=2 && COMMON==1 && G5==1 && KGPhase3==1';
     elif [ "${category}" = "Unfiltered" ]; then bcftools view;
     else exit "Category: ${category} is not recognized"; fi | \
-    bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
+    if   [ "${params.set_id}" = "true" ];  then bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT'; else bcftools view; fi | \
     bcftools view --threads ${task.cpus} -Oz -o ${cohort}.${key}.${category}.vcf.gz
 
     # Index the VCF
@@ -53,6 +55,12 @@ process FILTER {
 		-d -A tab \
 		${cohort}.${key}.${category}.vcf.gz \
 		>> ${cohort}.${key}.${category}.annotations.tsv
+
+    # Extract variants
+	bcftools query \
+		-f '%CHROM\t%POS\n' \
+		${cohort}.${key}.${category}.vcf.gz \
+        > ${cohort}.${key}.${category}.variants.txt
     
     # Extract allele depth
     bcftools query -f '[%CHROM:%POS:%REF:%ALT\t%SAMPLE\t%GT\t%AD\n]' \

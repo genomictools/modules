@@ -17,6 +17,6 @@ process COORDINATES {
     script:
     """
     #!/bin/bash
-    generate_coordinates.R ${chrom} ${start} ${end} ${genelist} ${genome} ${style} ${params.coding} ${params.chunk} ${key}.${genelist.simpleName}.bed
+    generate_coordinates.R ${chrom} ${start} ${end} ${genelist} ${genome} ${style} ${params.coding} ${params.chunk_width} ${key}.${genelist.simpleName}.bed
     """
 }
