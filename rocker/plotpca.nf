@@ -1,4 +1,4 @@
-process PLOT {
+process PLOTPCA {
     tag "${ref}:${cohort}:${mode}"
 
     label 'simple'
