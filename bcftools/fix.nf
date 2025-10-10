@@ -9,8 +9,8 @@ process FIX {
     input:
     tuple val(cohort), val(type), val(chunk),
           path(vcf_in), path(index_in),
-          val(n_samples), val(n_variants)
-          val(fasta), path(fasta_in)
+          val(n_samples), val(n_variants),
+          val(assembly), path(fasta), path(fasta_in)
 
     output:
     tuple val(cohort), val(type), val(chunk),
@@ -26,7 +26,7 @@ process FIX {
         ${vcf_in} \
         -Oz -o ${cohort}.${type}.${chunk}.fixed.vcf.gz \
         -- -d \
-        -f ${fasta_in} \
+        -f ${fasta} \
         -m flip
 
     tabix ${cohort}.${type}.${chunk}.fixed.vcf.gz
