@@ -1,5 +1,5 @@
 process FILTER {
-    tag "${cohort}:${category}"
+    tag "${cohort}:${key}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,30 +7,37 @@ process FILTER {
     publishDir("${params.output_dir}/filtered", mode: 'copy')
 
     input:
-    tuple val(cohort), val(category),
-          path(bim), path(bed), path(fam), path(nosex), path(log)
+    tuple val(cohort), val(key), val(category),
+          path(bim), path(bed), path(fam), path(log),
+          val(n_samples), val(n_variants)
 
     output:
-    tuple val(cohort), val(category),
-          path("${cohort}.${category}.filtered.bim"),
-          path("${cohort}.${category}.filtered.bed"),
-          path("${cohort}.${category}.filtered.fam"),
-          path("${cohort}.${category}.filtered.nosex"),
-          path("${cohort}.${category}.filtered.log")
+    tuple val(cohort), val(key), val(category),
+          path("${cohort}.${key}.${category}.filtered.bim"),
+          path("${cohort}.${key}.${category}.filtered.bed"),
+          path("${cohort}.${key}.${category}.filtered.fam"),
+          path("${cohort}.${key}.${category}.filtered.log"),
+          env(n_samples), env(n_variants)
 
     script:
+    def args = []
+    if ( params.nonfounders ) { args << "--nonfounders" }
+    if ( params.allow_novariants ) { args << "--allow-no-vars" }
+    if ( params.allow_nosamples )  { args << "--allow-no-samples" }
+    def args_str = args.join(' ')
+
     """
-    #!/bin/bash
     # Filter variants
-    plink \
-        --bfile ${bim.baseName} \
-        --mind ${params.mind} \
-        --geno ${params.geno} \
+    plink --bfile ${bim.baseName} \
+        --mac ${params.mac} \
         --maf ${params.maf} \
         --hwe ${params.hwe} \
-        --allow-no-sex \
+        --geno ${params.geno} \
+        ${args_str} \
         --make-bed \
-        --out ${cohort}.${category}.filtered
-    cat ${nosex} > ${cohort}.${category}.filtered.nosex
+        --out ${cohort}.${key}.${category}.filtered
+    
+    n_samples=\$(wc -l < "${cohort}.${key}.${category}.filtered.fam")
+    n_variants=\$(wc -l < "${cohort}.${key}.${category}.filtered.bim")
     """
 }

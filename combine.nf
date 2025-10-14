@@ -8,15 +8,16 @@ process COMBINE {
 
     input:
     tuple val(cohort), val(key), val(category),
-          path(bim), path(bed), path(fam), path(nosex), path(log)
+          path(bim), path(bed), path(fam), path(log),
+          val(n_samples), val(n_variants)
 
     output:
     tuple val(cohort), val(category),
           path("${cohort}.${category}.bim"),
           path("${cohort}.${category}.bed"),
           path("${cohort}.${category}.fam"),
-          path("${cohort}.${category}.nosex"),
-          path("${cohort}.${category}.log")
+          path("${cohort}.${category}.log"),
+          env(n_samples), env(n_variants)
 
     script:
     """
@@ -33,5 +34,8 @@ process COMBINE {
         --merge-list allfiles.txt \
         --allow-no-sex \
         --out ${cohort}.${category}
+
+    n_samples=\$(wc -l < "${cohort}.${category}.fam")
+    n_variants=\$(wc -l < "${cohort}.${category}.bim")
     """
 }

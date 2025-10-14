@@ -8,7 +8,7 @@ process PLOT {
 
     input:
     tuple val(cohort), val(category), val(test), val(phenotype),
-          path(test_file), path(test_nosex), path(test_log)
+          path(test_file), path(test_log)
 
     output:
     tuple val(cohort), val(category), val(test), val(phenotype),
