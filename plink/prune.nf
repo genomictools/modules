@@ -1,5 +1,5 @@
 process PRUNE {
-    tag "${cohort}:${type}:${chunk}"
+    tag "${cohort}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,18 +7,24 @@ process PRUNE {
     publishDir("${params.output_dir}/pruned", mode: 'copy')
 
     input:
-    tuple val(cohort), val(type), val(chunk),
-          path(bim), path(bed), path(fam), path(nosex), path(log)
-          
+    tuple val(cohort), val(category),
+          path(bim), path(bed), path(fam), path(log),
+          val(n_samples), val(n_variants)
+
     output:
-    tuple val(cohort), val(type), val(chunk),
-          path("${cohort}.${type}.${chunk}.prune.bim"),
-          path("${cohort}.${type}.${chunk}.prune.bed"),
-          path("${cohort}.${type}.${chunk}.prune.fam"),
-          path("${cohort}.${type}.${chunk}.prune.nosex"),
-          path("${cohort}.${type}.${chunk}.prune.log")
+    tuple val(cohort), val(category),
+          path("${cohort}.${category}.pruned.bim"),
+          path("${cohort}.${category}.pruned.bed"),
+          path("${cohort}.${category}.pruned.fam"),
+          path("${cohort}.${category}.pruned.log"),
+          env(n_samples), env(n_variants)
 
     script:
+    def args = []
+    if ( params.allow_novariants ) { args << "--allow-no-vars" }
+    if ( params.allow_nosamples )  { args << "--allow-no-samples" }
+    def args_str = args.join(' ')
+
     """
     #!/bin/bash        
     plink --bfile ${bim.baseName} \
@@ -28,11 +34,14 @@ process PRUNE {
     plink --bfile ${bim.baseName} \
         --extract plink_tmp.prune.in \
         --make-bed \
-        --out ${cohort}.${type}.${chunk}.prune
-    
+        ${args_str} \
+        --out ${cohort}.${category}.pruned
+
     # Explicitly rename output files
-    mv plink_tmp.prune.log ${cohort}.${type}.${chunk}.prune.log
-    mv plink_tmp.prune.in  ${cohort}.${type}.${chunk}.prune.in
-    mv plink_tmp.prune.out ${cohort}.${type}.${chunk}.prune.out
+    mv plink_tmp.prune.in  ${cohort}.${category}.pruned.in
+    mv plink_tmp.prune.out ${cohort}.${category}.pruned.out
+
+    n_samples=\$(wc -l < "${cohort}.${category}.pruned.fam")
+    n_variants=\$(wc -l < "${cohort}.${category}.pruned.bim")
     """
 }

@@ -1,5 +1,5 @@
 process CONVERT {
-    tag "${cohort}:${key}:${category}"
+    tag "${cohort}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,26 +7,44 @@ process CONVERT {
     publishDir("${params.output_dir}/plinked", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(category),
+    tuple val(cohort), val(category),
           path(file), path(index),
           val(n_samples), val(n_variants),
-          path(phenotype)
+          path(pedigree)
 
     output:
-    tuple val(cohort), val(key), val(category),
-          path("${cohort}.${key}.${category}.bim"),
-          path("${cohort}.${key}.${category}.bed"),
-          path("${cohort}.${key}.${category}.fam"),
-          path("${cohort}.${key}.${category}.nosex"),
-          path("${cohort}.${key}.${category}.log")
+    tuple val(cohort), val(category),
+          path("${cohort}.${category}.bim"),
+          path("${cohort}.${category}.bed"),
+          path("${cohort}.${category}.fam"),
+          path("${cohort}.${category}.log"),
+          env(n_samples), env(n_variants)
 
     script:
+    args = []
+    if ( !params.family_ids ) { args << "--const-fid" }
+    args_str = args.join(" ")
     """
     #!/bin/bash
+    # if params.family_ids is false, set all family IDs to 0
+    if [ "${params.family_ids}" = "false" ]; then
+        awk '{print "0", \$2, \$6}' ${pedigree} > phenotype.tsv
+        awk '{print "0", \$2, \$5}' ${pedigree} > sex.tsv
+    else
+        awk '{print \$1, \$2, \$6}' ${pedigree} > phenotype.tsv
+        awk '{print \$1, \$2, \$5}' ${pedigree} > sex.tsv
+    fi
+
     plink \
         --vcf ${file} \
+        --pheno phenotype.tsv \
+        --update-sex sex.tsv \
+        ${args_str} \
+        --vcf-half-call ${params.halfcalls} \
         --make-bed \
-        --pheno <(awk '{print \$1, \$2, \$6}' ${phenotype}) \
-        --out ${cohort}.${key}.${category}
+        --out ${cohort}.${category}
+
+    n_samples=\$(wc -l < "${cohort}.${category}.fam")
+    n_variants=\$(wc -l < "${cohort}.${category}.bim")
     """
 }

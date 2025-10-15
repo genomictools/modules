@@ -1,10 +1,10 @@
-process FILTER {
+process REMOVE {
     tag "${cohort}:${category}"
 
     label 'simple'
     label 'plink'
 
-    publishDir("${params.output_dir}/filtered", mode: 'copy')
+    publishDir("${params.output_dir}/removed", mode: 'copy')
 
     input:
     tuple val(cohort), val(category),
@@ -13,10 +13,10 @@ process FILTER {
 
     output:
     tuple val(cohort), val(category),
-          path("${cohort}.${category}.filtered.bim"),
-          path("${cohort}.${category}.filtered.bed"),
-          path("${cohort}.${category}.filtered.fam"),
-          path("${cohort}.${category}.filtered.log"),
+          path("${cohort}.${category}.removed.bim"),
+          path("${cohort}.${category}.removed.bed"),
+          path("${cohort}.${category}.removed.fam"),
+          path("${cohort}.${category}.removed.log"),
           env(n_samples), env(n_variants)
 
     script:
@@ -29,15 +29,13 @@ process FILTER {
     """
     # Filter variants
     plink --bfile ${bim.baseName} \
-        --mac ${params.mac} \
-        --maf ${params.maf} \
-        --hwe ${params.hwe} \
-        --geno ${params.geno} \
+        --mind ${params.mind} \
+        --rel-cutoff ${params.relatedness} \
         ${args_str} \
         --make-bed \
-        --out ${cohort}.${category}.filtered
-
-    n_samples=\$(wc -l < "${cohort}.${category}.filtered.fam")
-    n_variants=\$(wc -l < "${cohort}.${category}.filtered.bim")
+        --out ${cohort}.${category}.removed
+    
+    n_samples=\$(wc -l < "${cohort}.${category}.removed.fam")
+    n_variants=\$(wc -l < "${cohort}.${category}.removed.bim")
     """
 }
