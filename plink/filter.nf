@@ -8,8 +8,7 @@ process FILTER {
 
     input:
     tuple val(ref), val(cohort),
-          path(bim), path(bed), path(fam), path(nosex), path(log),
-          path(pop)
+          path(bim), path(bed), path(fam), path(nosex), path(log)
 
     output:
     tuple val(ref), val(cohort),
@@ -17,30 +16,18 @@ process FILTER {
           path("${ref}.${cohort}.filtered.bed"),
           path("${ref}.${cohort}.filtered.fam"),
           path("${ref}.${cohort}.filtered.nosex"),
-          path("${ref}.${cohort}.filtered.log"),
-          path(pop)
+          path("${ref}.${cohort}.filtered.log")
 
     script:
     """
     #!/bin/bash
     # Filter variants
     plink --bfile ${bim.baseName} \
+        --mac ${params.MAC} \
         --maf ${params.MAF} \
         --hwe ${params.HWE} \
         --geno ${params.F_MISSING} \
-        --write-snplist \
-        --out filtered
-
-    # Select N_VARS random variants
-    RANDOM=42; shuf -n ${params.N_VARS} filtered.snplist > ${ref}.${cohort}.variants.txt
-
-    # Extract variants
-    plink --bfile ${bim.baseName} \
-        --extract ${ref}.${cohort}.variants.txt \
         --make-bed \
         --out ${ref}.${cohort}.filtered
-
-    # Export filtering log
-    mv filtered.log ${ref}.${cohort}.filtered.log
     """
 }

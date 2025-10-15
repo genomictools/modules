@@ -8,8 +8,7 @@ process PRUNE {
 
     input:
     tuple val(cohort), val(type), val(chunk),
-          path(bim), path(bed), path(fam), path(nosex), path(log),
-          path(ld_regions)
+          path(bim), path(bed), path(fam), path(nosex), path(log)
           
     output:
     tuple val(cohort), val(type), val(chunk),
@@ -23,15 +22,12 @@ process PRUNE {
     """
     #!/bin/bash        
     plink --bfile ${bim.baseName} \
-        --exclude range ${ld_regions} \
         --indep-pairwise ${params.window} ${params.step} ${params.rsquared} \
-        --const-fid 0 \
         --out plink_tmp
     
     plink --bfile ${bim.baseName} \
         --extract plink_tmp.prune.in \
         --make-bed \
-        --const-fid 0 \
         --out ${cohort}.${type}.${chunk}.prune
     
     # Explicitly rename output files
