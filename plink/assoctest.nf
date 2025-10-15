@@ -1,4 +1,4 @@
-process TEST {
+process ASSOCTEST {
     tag "${cohort}:${test}"
 
     label 'simple'

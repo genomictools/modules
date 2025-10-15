@@ -1,4 +1,4 @@
-process PLOT {
+process PLOTMANHATTAN {
     tag "${cohort}:${test}"
 
     label 'simple'
