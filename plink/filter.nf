@@ -1,5 +1,5 @@
 process FILTER {
-    tag "${cohort}:${category}"
+    tag "${cohort}:${key}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,16 +7,16 @@ process FILTER {
     publishDir("${params.output_dir}/filtered", mode: 'copy')
 
     input:
-    tuple val(cohort), val(category),
+    tuple val(cohort), val(key), val(category),
           path(bim), path(bed), path(fam), path(log),
           val(n_samples), val(n_variants)
 
     output:
-    tuple val(cohort), val(category),
-          path("${cohort}.${category}.filtered.bim"),
-          path("${cohort}.${category}.filtered.bed"),
-          path("${cohort}.${category}.filtered.fam"),
-          path("${cohort}.${category}.filtered.log"),
+    tuple val(cohort), val(key), val(category),
+          path("${cohort}.${key}.${category}.filtered.bim"),
+          path("${cohort}.${key}.${category}.filtered.bed"),
+          path("${cohort}.${key}.${category}.filtered.fam"),
+          path("${cohort}.${key}.${category}.filtered.log"),
           env(n_samples), env(n_variants)
 
     script:
@@ -35,9 +35,9 @@ process FILTER {
         --geno ${params.geno} \
         ${args_str} \
         --make-bed \
-        --out ${cohort}.${category}.filtered
+        --out ${cohort}.${key}.${category}.filtered
 
-    n_samples=\$(wc -l < "${cohort}.${category}.filtered.fam")
-    n_variants=\$(wc -l < "${cohort}.${category}.filtered.bim")
+    n_samples=\$(wc -l < "${cohort}.${key}.${category}.filtered.fam")
+    n_variants=\$(wc -l < "${cohort}.${key}.${category}.filtered.bim")
     """
 }

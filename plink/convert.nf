@@ -1,5 +1,5 @@
 process CONVERT {
-    tag "${cohort}:${category}"
+    tag "${cohort}:${key}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,17 +7,17 @@ process CONVERT {
     publishDir("${params.output_dir}/plinked", mode: 'copy')
 
     input:
-    tuple val(cohort), val(category),
+    tuple val(cohort), val(key), val(category),
           path(file), path(index),
           val(n_samples), val(n_variants),
           path(pedigree)
 
     output:
-    tuple val(cohort), val(category),
-          path("${cohort}.${category}.bim"),
-          path("${cohort}.${category}.bed"),
-          path("${cohort}.${category}.fam"),
-          path("${cohort}.${category}.log"),
+    tuple val(cohort), val(key), val(category),
+          path("${cohort}.${key}.${category}.bim"),
+          path("${cohort}.${key}.${category}.bed"),
+          path("${cohort}.${key}.${category}.fam"),
+          path("${cohort}.${key}.${category}.log"),
           env(n_samples), env(n_variants)
 
     script:
@@ -42,9 +42,9 @@ process CONVERT {
         ${args_str} \
         --vcf-half-call ${params.halfcalls} \
         --make-bed \
-        --out ${cohort}.${category}
+        --out ${cohort}.${key}.${category}
 
-    n_samples=\$(wc -l < "${cohort}.${category}.fam")
-    n_variants=\$(wc -l < "${cohort}.${category}.bim")
+    n_samples=\$(wc -l < "${cohort}.${key}.${category}.fam")
+    n_variants=\$(wc -l < "${cohort}.${key}.${category}.bim")
     """
 }
