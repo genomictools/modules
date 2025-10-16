@@ -8,16 +8,15 @@ process ASSIGN {
 
     input:
     tuple val(ref), val(cohort), val(mode),
-          path(file), path(log), path(pop)
-    
+          path(file), path(pop), path(log)
+
     output:
     tuple val(ref), val(cohort), val(mode),
-          path(file), path(log),
-          path("${ref}.${cohort}.${mode}.pop")
+          path(file), path(pop), path(log)
     
     script:
     """
     #!/bin/bash
-    assign_pop.R ${ref} ${cohort} ${mode} ${file} ${pop} ${params.N_DIMS}
+    assign_pop.R ${ref} ${cohort} ${mode} ${file} ${pop} ${params.dimension}
     """
 }

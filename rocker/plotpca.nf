@@ -8,7 +8,7 @@ process PLOTPCA {
 
     input:
     tuple val(ref), val(cohort), val(mode),
-          path(file), path(log), path(pop)
+          path(file), path(pop), path(log)
     
     output:
     tuple val(ref), val(cohort), val(mode),

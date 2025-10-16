@@ -8,15 +8,16 @@ process SAMPLE {
 
     input:
     tuple val(ref), val(cohort),
-          path(bim), path(bed), path(fam), path(nosex), path(log)
+          path(bim), path(bed), path(fam), path(log),
+          val(n_samples), val(n_variants)
 
     output:
     tuple val(ref), val(cohort),
           path("${ref}.${cohort}.sampled.bim"),
           path("${ref}.${cohort}.sampled.bed"),
           path("${ref}.${cohort}.sampled.fam"),
-          path("${ref}.${cohort}.sampled.nosex"),
-          path("${ref}.${cohort}.sampled.log")
+          path("${ref}.${cohort}.sampled.log"),
+          env(n_samples), env(n_variants)
 
     script:
     """
@@ -34,5 +35,8 @@ process SAMPLE {
         --extract ${ref}.${cohort}.variants.txt \
         --make-bed \
         --out ${ref}.${cohort}.sampled
+    
+    n_samples=\$(wc -l < "${ref}.${cohort}.sampled.fam")
+    n_variants=\$(wc -l < "${ref}.${cohort}.sampled.bim")
     """
 }
