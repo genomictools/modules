@@ -8,15 +8,16 @@ process PLOTPCA {
 
     input:
     tuple val(ref), val(cohort), val(mode),
-          path(file), path(pop), path(log)
+          path(scaled), path(pop), path(log)
     
     output:
     tuple val(ref), val(cohort), val(mode),
-          path("${ref}.${cohort}.${mode}.png")
+          path("${ref}.${cohort}.${mode}.png"),
+          path("${ref}.${cohort}.${mode}.log")
     
     script:
     """
     #!/bin/bash
-    plot_pca.R ${ref} ${cohort} ${mode} ${file} ${pop} ${params.N_DIMS}
+    plot_pca.R ${ref} ${cohort} ${mode} ${scaled} ${pop} ${params.dimension} 2> ${ref}.${cohort}.${mode}.log
     """
 }

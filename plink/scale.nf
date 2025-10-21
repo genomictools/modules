@@ -10,13 +10,12 @@ process SCALE {
     tuple val(ref), val(cohort),
           path(bim), path(bed), path(fam), path(log), 
           val(n_samples), val(n_variants),
-          path(pop),
-          val(mode)
+          val(mode),
+          path(pop)
 
     output:
-    tuple val(ref), val(cohort), val(mode),
+    tuple val(ref), val(cohort), val(mode), path(pop),
           path("${ref}.${cohort}.${mode}.txt"),
-          path("${ref}.${cohort}.${mode}.pop"),
           path("${ref}.${cohort}.${mode}.log")
 
     script:
@@ -25,14 +24,13 @@ process SCALE {
         #!/bin/bash
         # Return population file, and extract clusters
         if [ "${params.family_ids}" = "false" ]; then
-            cat ${pop} | awk '{print "0", \$2, \$3, \$4, \$5}' > ${ref}.${cohort}.${mode}.pop
+            cat ${pop} | awk '{ print "0", \$2, \$3}' > populations.txt
         else
-            cat ${pop} > ${ref}.${cohort}.${mode}.pop
+            cat ${pop} | awk '{ print \$1, \$2, \$3}' > populations.txt
         fi
 
-        cat ${ref}.${cohort}.${mode}.pop | awk '{ print "0", \$2, \$3}' > populations.txt
-        cat ${ref}.${cohort}.${mode}.pop | awk '{ print \$3}' | sort -u | grep -v "NA" | grep -v "0" > clusters.txt
-        
+        cat ${pop} | awk '{ print \$3}' | sort -u | grep -v "NA" | grep -v "0" > clusters.txt
+
         # Perform PCA with clusters
         plink --bfile ${bim.baseName} \
             --pca ${params.dimension} \
@@ -45,14 +43,6 @@ process SCALE {
         """
     } else if (mode == 'noclusters') {
         """
-        #!/bin/bash        
-        # Return population file
-        if [ "${params.family_ids}" = "false" ]; then
-            cat ${pop} | awk '{print "0", \$2, \$3, \$4, \$5}' > ${ref}.${cohort}.${mode}.pop
-        else
-            cat ${pop} > ${ref}.${cohort}.${mode}.pop
-        fi
-
         # Perform PCA with no clusters
         plink --bfile ${bim.baseName} \
             --pca ${params.dimension} \
@@ -62,14 +52,6 @@ process SCALE {
         """
     } else if (mode == 'mds') {
         """
-        #!/bin/bash
-        # Return population file
-        if [ "${params.family_ids}" = "false" ]; then
-            cat ${pop} | awk '{print "0", \$2, \$3, \$4, \$5}' > ${ref}.${cohort}.${mode}.pop
-        else
-            cat ${pop} > ${ref}.${cohort}.${mode}.pop
-        fi
-
         # Perform MDS
         plink --bfile ${bim.baseName} \
             --genome \
