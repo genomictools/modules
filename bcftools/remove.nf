@@ -9,14 +9,14 @@ process REMOVE {
     input:
     tuple val(cohort), val(type), val(chunk),
           path(vcf_in), path(index_in),
-          env(n_vars)
+          val(n_samples), val(n_variants)
 
     output:
     tuple val(cohort), val(type), val(chunk),
           path("${cohort}.${type}.${chunk}.removed.vcf.gz"),
           path("${cohort}.${type}.${chunk}.removed.vcf.gz.tbi"),
-          env(n_vars)
-     
+          env(n_samples), env(n_variants)
+
     script:
     """
     #!/bin/bash
@@ -28,6 +28,7 @@ process REMOVE {
         -Oz -o ${cohort}.${type}.${chunk}.removed.vcf.gz
     
     tabix ${cohort}.${type}.${chunk}.removed.vcf.gz
-    n_vars=\$(bcftools index -n ${cohort}.${type}.${chunk}.removed.vcf.gz)
+    n_samples=\$(bcftools query -l ${cohort}.${type}.${chunk}.picked.vcf.gz | wc -l)
+    n_variants=\$(bcftools index -n ${cohort}.${type}.${chunk}.removed.vcf.gz)
     """
 }

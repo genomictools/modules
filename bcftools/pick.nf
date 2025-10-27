@@ -15,7 +15,7 @@ process PICK {
     tuple val(cohort), val(type), val(chunk),
           path("${cohort}.${type}.${chunk}.picked.vcf.gz"),
           path("${cohort}.${type}.${chunk}.picked.vcf.gz.tbi"),
-          env(n_vars)
+          env(n_samples), env(n_variants)
      
     script:
     """
@@ -28,6 +28,7 @@ process PICK {
         -Oz -o ${cohort}.${type}.${chunk}.picked.vcf.gz
 
     tabix ${cohort}.${type}.${chunk}.picked.vcf.gz
-    n_vars=\$(bcftools index -n ${cohort}.${type}.${chunk}.picked.vcf.gz)
+    n_samples=\$(bcftools query -l ${cohort}.${type}.${chunk}.picked.vcf.gz | wc -l)
+    n_variants=\$(bcftools index -n ${cohort}.${type}.${chunk}.picked.vcf.gz)
     """
 }

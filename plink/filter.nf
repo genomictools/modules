@@ -1,5 +1,5 @@
 process FILTER {
-    tag "${ref}:${cohort}"
+    tag "${cohort}:${key}:${category}"
 
     label 'simple'
     label 'plink'
@@ -7,40 +7,37 @@ process FILTER {
     publishDir("${params.output_dir}/filtered", mode: 'copy')
 
     input:
-    tuple val(ref), val(cohort),
-          path(bim), path(bed), path(fam), path(nosex), path(log),
-          path(pop)
+    tuple val(cohort), val(key), val(category),
+          path(bim), path(bed), path(fam), path(log),
+          val(n_samples), val(n_variants)
 
     output:
-    tuple val(ref), val(cohort),
-          path("${ref}.${cohort}.filtered.bim"),
-          path("${ref}.${cohort}.filtered.bed"),
-          path("${ref}.${cohort}.filtered.fam"),
-          path("${ref}.${cohort}.filtered.nosex"),
-          path("${ref}.${cohort}.filtered.log"),
-          path(pop)
+    tuple val(cohort), val(key), val(category),
+          path("${cohort}.${key}.${category}.filtered.bim"),
+          path("${cohort}.${key}.${category}.filtered.bed"),
+          path("${cohort}.${key}.${category}.filtered.fam"),
+          path("${cohort}.${key}.${category}.filtered.log"),
+          env(n_samples), env(n_variants)
 
     script:
+    def args = []
+    if ( params.nonfounders ) { args << "--nonfounders" }
+    if ( params.allow_novariants ) { args << "--allow-no-vars" }
+    if ( params.allow_nosamples )  { args << "--allow-no-samples" }
+    def args_str = args.join(' ')
+
     """
-    #!/bin/bash
     # Filter variants
     plink --bfile ${bim.baseName} \
-        --maf ${params.MAF} \
-        --hwe ${params.HWE} \
-        --geno ${params.F_MISSING} \
-        --write-snplist \
-        --out filtered
-
-    # Select N_VARS random variants
-    RANDOM=42; shuf -n ${params.N_VARS} filtered.snplist > ${ref}.${cohort}.variants.txt
-
-    # Extract variants
-    plink --bfile ${bim.baseName} \
-        --extract ${ref}.${cohort}.variants.txt \
+        --mac ${params.mac} \
+        --maf ${params.maf} \
+        --hwe ${params.hwe} \
+        --geno ${params.geno} \
+        ${args_str} \
         --make-bed \
-        --out ${ref}.${cohort}.filtered
+        --out ${cohort}.${key}.${category}.filtered
 
-    # Export filtering log
-    mv filtered.log ${ref}.${cohort}.filtered.log
+    n_samples=\$(wc -l < "${cohort}.${key}.${category}.filtered.fam")
+    n_variants=\$(wc -l < "${cohort}.${key}.${category}.filtered.bim")
     """
 }

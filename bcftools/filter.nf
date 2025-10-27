@@ -56,7 +56,7 @@ process FILTER {
 		${cohort}.${key}.${category}.vcf.gz \
 		>> ${cohort}.${key}.${category}.annotations.tsv
 
-    # Extract variant IDs
+    # Extract variants
 	bcftools query \
 		-f '%CHROM\t%POS\n' \
 		${cohort}.${key}.${category}.vcf.gz \

@@ -8,28 +8,23 @@ process MERGE {
 
     input:
     tuple val(cohort), val(cohort_type),
-          path(cohort_bim), path(cohort_bed), path(cohort_fam), path(cohort_nosex), path(cohort_log), path(cohort_pop)
+          path(cohort_bim), path(cohort_bed), path(cohort_fam), path(cohort_log),
+          val(n_samples), val(n_variants)
     tuple val(ref), val(ref_type),
-          path(ref_bim), path(ref_bed), path(ref_fam), path(ref_nosex), path(ref_log), path(ref_pop)
+          path(ref_bim), path(ref_bed), path(ref_fam), path(ref_log),
+          val(n_ref_samples), val(n_ref_variants)
 
     output:
     tuple val(ref), val(cohort),
           path("${ref}.${cohort}.bim"),
           path("${ref}.${cohort}.bed"),
           path("${ref}.${cohort}.fam"),
-          path("${ref}.${cohort}.nosex"),
           path("${ref}.${cohort}.log"),
-          path("${ref}.${cohort}.pop")
+          env(n_samples), env(n_variants)
 
     script:
     """
     #!/bin/bash
-    # Return population file
-    cat \
-        <(cat ${ref_pop}    | awk '{print \$0, "${ref_type}"}') \
-        <(cat ${cohort_pop} | awk '{print \$0, "${cohort_type}"}') \
-        > ${ref}.${cohort}.pop
-    
     # Get common snps
     comm -12 \
         <( cat ${ref_bim}    | awk '{print \$2}' | sort ) \
@@ -42,6 +37,8 @@ process MERGE {
         --extract common_snps.txt \
         --make-bed \
         --out ${ref}.${cohort}
+    n_samples=\$(wc -l < "${ref}.${cohort}.fam")
+    n_variants=\$(wc -l < "${ref}.${cohort}.bim")
     """
 }
 
