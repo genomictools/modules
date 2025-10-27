@@ -2,7 +2,7 @@ process FORMAT {
     tag "${assembly}:${tool}:${version}:${id}"
 
     label 'simple'
-    label 'deepmvp'
+    label 'bcftools'
 
     publishDir("${params.output_dir}/annotations/${tool}", mode: 'copy')
 
