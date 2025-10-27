@@ -43,7 +43,7 @@ process CONVERT {
         --vcf-half-call ${params.halfcalls} \
         --make-bed \
         --out ${cohort}.${key}.${category}
-    
+
     n_samples=\$(wc -l < "${cohort}.${key}.${category}.fam")
     n_variants=\$(wc -l < "${cohort}.${key}.${category}.bim")
     """

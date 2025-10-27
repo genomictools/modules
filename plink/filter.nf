@@ -36,7 +36,7 @@ process FILTER {
         ${args_str} \
         --make-bed \
         --out ${cohort}.${key}.${category}.filtered
-    
+
     n_samples=\$(wc -l < "${cohort}.${key}.${category}.filtered.fam")
     n_variants=\$(wc -l < "${cohort}.${key}.${category}.filtered.bim")
     """
