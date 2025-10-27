@@ -1,13 +1,13 @@
 process MERGE {
     tag "${cohort}"
 
-    label 'max'
+    label 'simple'
     label 'bcftools'
 
     publishDir("${params.output_dir}/combined", mode: 'copy')
 
     input:
-    tuple val(id), path(files), val(cohort)
+    tuple val(id), path(files), path(indexes), val(cohort)
 
     output:
     tuple val(cohort),
@@ -17,10 +17,8 @@ process MERGE {
     """
     #!/bin/bash
     # Merge
-    echo "${files.join('\n')}" | grep -v tbi | uniq > ${cohort}.txt
     bcftools merge \
-        -l ${cohort}.txt | \
-    bcftools view \
+        ${files.join(' ')} \
         --threads ${task.cpus} \
         -Oz -o ${cohort}.vcf.gz
 

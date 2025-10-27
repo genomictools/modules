@@ -1,7 +1,7 @@
 process CONVERT {
     tag "${id}"
 
-    label 'max'
+    label 'simple'
     label 'pysam'
 
     publishDir("${params.output_dir}/converted", mode: 'copy')
@@ -17,7 +17,7 @@ process CONVERT {
     script:
     """
     #!/bin/bash
-    pythongvcf_to_vcf.py ${files[0]} ${params.fasta} | bgzip > ${id}.converted.vcf.gz
-    touch ${id}.converted.vcf.gz.tbi
+    gvcf_to_vcf.py ${files[0]} ${file(params.fasta)} | bgzip > ${id}.converted.vcf.gz
+    tabix ${id}.converted.vcf.gz
     """
 }
