@@ -10,7 +10,7 @@ process DOWNLOAD {
     tuple val(id), val(url)
 
     output:
-    tuple val(id), path("${id}/*.vcf.gz{,.tbi}")
+    tuple val(id), path("${id}/${id}.*")
     
     secret 'TOKEN'
     //  nextflow secrets set TOKEN "<GDC_TOKEN>"
