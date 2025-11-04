@@ -1,5 +1,5 @@
 process COMBINE {
-    tag "${cohort}:${assembly}:${fasta_id}"
+    tag "${cohort}:${assembly}:${chrom}:${start}-${end}"
 
     label 'simple'
     label 'gatk'
@@ -7,13 +7,15 @@ process COMBINE {
     publishDir("${params.output_dir}/combined", mode: 'copy')
 
     input:
-    tuple val(cohort), val(id), path(file), path(index),
-          val(assembly), val(fasta_id), path(fasta), path(fasta_index), path(fasta_dict)
+    tuple val(cohort), 
+          val(id), path(file), path(index),
+          val(assembly), path(fasta),
+          val(chrom), val(start), val(end)
 
     output:
-    tuple val(assembly), val(fasta_id), val(cohort),
-          path("${assembly}.${fasta_id}.${cohort}.combined.g.vcf.gz"),
-          path("${assembly}.${fasta_id}.${cohort}.combined.g.vcf.gz.tbi")
+    tuple val(cohort), val(assembly), val(chrom), val(start), val(end),
+          path("${cohort}.${assembly}.${chrom}:${start}-${end}.combined.g.vcf.gz"),
+          path("${cohort}.${assembly}.${chrom}:${start}-${end}.combined.g.vcf.gz.tbi")
 
     script:
     def args = []
@@ -22,10 +24,10 @@ process COMBINE {
     """
     #!/bin/bash
     gatk CombineGVCFs \
-        -R ${fasta} \
+        -R ${assembly}.fasta \
         ${args_str} \
-        --intervals ${fasta_id} \
+        --intervals ${chrom}:${start}-${end} \
         --create-output-variant-index \
-        -O ${assembly}.${fasta_id}.${cohort}.combined.g.vcf.gz
+        -O ${cohort}.${assembly}.${chrom}:${start}-${end}.combined.g.vcf.gz
     """
 }
