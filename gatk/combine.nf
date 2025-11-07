@@ -1,7 +1,7 @@
 process COMBINE {
     tag "${cohort}:${assembly}:${chrom}:${start}-${end}"
 
-    label 'simple'
+    label 'heavy'
     label 'gatk'
 
     publishDir("${params.output_dir}/combined", mode: 'copy')
