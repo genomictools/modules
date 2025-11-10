@@ -7,12 +7,13 @@ def createChunks(chrom_sizes_file, width) {
         | splitCsv(header: false, sep: '\t')
         | flatMap { row -> 
             def chrom = row[0]
-            def chrom_size = row[1] as Integer
+            def chrom_start = row[1] as Integer
+            def chrom_end = row[2] as Integer
             def chunk_width = width as Integer
             def regions = []
             
-            for (int start = 1; start <= chrom_size; start += chunk_width) {
-                def end = Math.min(start + chunk_width - 1, chrom_size)
+            for (int start = chrom_start; start <= chrom_end; start += chunk_width) {
+                def end = Math.min(start + chunk_width - 1, chrom_end)
                 regions.add([chrom, start, end])
             }
             return regions
