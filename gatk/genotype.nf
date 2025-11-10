@@ -1,5 +1,5 @@
 process GENOTYPE {
-    tag "${cohort}:${assembly}:${chrom}:${start}-${end}"
+    tag "${assembly}:${cohort}:${chunk}"
 
     label 'simple'
     label 'gatk'
@@ -7,24 +7,24 @@ process GENOTYPE {
     publishDir("${params.output_dir}/genotyped", mode: 'copy')
 
     input:
-    tuple val(cohort), val(assembly), val(chrom), val(start), val(end),
-          path(file), path(index),
-          val(assembly), path(fasta)
+    tuple val(assembly), val(cohort), val(chunk),
+          path(db), path(fasta)
 
     output:
-    tuple val(cohort), val(assembly), val(chrom), val(start), val(end),
-          path("${cohort}.${assembly}.${chrom}:${start}-${end}.genotyped.vcf.gz"),
-          path("${cohort}.${assembly}.${chrom}:${start}-${end}.genotyped.vcf.gz.tbi")
+    tuple val(assembly), val(cohort), val(chunk),
+          path("${assembly}.${cohort}.${chunk}.genotyped.vcf.gz"),
+          path("${assembly}.${cohort}.${chunk}.genotyped.vcf.gz.tbi")
 
     script:
     """
     #!/bin/bash
-    gatk GenotypeGVCFs \
-        -R ${assembly}.fasta \
-        -V ${file} \
-        --intervals ${chrom}:${start}-${end} \
-        --create-output-variant-index \
+    set -euo pipefail
+    
+    gatk --java-options "-Xmx8g -XX:ParallelGCThreads=2" GenotypeGVCFs \
+        -R ${fasta.last()} \
+        -V gendb://${db} \
         --allow-old-rms-mapping-quality-annotation-data \
-        -O ${cohort}.${assembly}.${chrom}:${start}-${end}.genotyped.vcf.gz
+        --create-output-variant-index \
+        -O ${assembly}.${cohort}.${chunk}.genotyped.vcf.gz
     """
 }

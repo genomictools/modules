@@ -1,5 +1,5 @@
 process COMBINE {
-    tag "${cohort}:${assembly}:${chrom}:${start}-${end}"
+    tag "${assembly}:${cohort}:${chunk}"
 
     label 'heavy'
     label 'gatk'
@@ -7,15 +7,12 @@ process COMBINE {
     publishDir("${params.output_dir}/combined", mode: 'copy')
 
     input:
-    tuple val(cohort), 
-          val(id), path(file), path(index),
-          val(assembly), path(fasta),
-          val(chrom), val(start), val(end)
+    tuple val(assembly), val(cohort), val(id), path(file), path(index),
+          val(chunk), path(bed)
 
     output:
-    tuple val(cohort), val(assembly), val(chrom), val(start), val(end),
-          path("${cohort}.${assembly}.${chrom}:${start}-${end}.combined.g.vcf.gz"),
-          path("${cohort}.${assembly}.${chrom}:${start}-${end}.combined.g.vcf.gz.tbi")
+    tuple val(assembly), val(cohort), val(chunk),
+          path("${assembly}.${cohort}.${chunk}")
 
     script:
     def args = []
@@ -23,11 +20,9 @@ process COMBINE {
     def args_str = args.join(' ')
     """
     #!/bin/bash
-    gatk CombineGVCFs \
-        -R ${assembly}.fasta \
-        ${args_str} \
-        --intervals ${chrom}:${start}-${end} \
-        --create-output-variant-index \
-        -O ${cohort}.${assembly}.${chrom}:${start}-${end}.combined.g.vcf.gz
+    gatk GenomicsDBImport \
+      ${args_str} \
+      --genomicsdb-workspace-path ${assembly}.${cohort}.${chunk} \
+      --intervals ${bed}
     """
 }
