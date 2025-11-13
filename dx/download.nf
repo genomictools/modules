@@ -10,8 +10,10 @@ process DOWNLOAD {
     tuple val(project), val(directory), val(filename)
 
     output:
-    tuple val(project), val(directory), path("${filename}")
-    
+    tuple val(project), val(directory),
+          path("${filename}"),
+          path("${filename}.dxdownload.log")
+
     secret 'TOKEN'
     //  nextflow secrets set TOKEN "<GDC_TOKEN>"
     
@@ -22,6 +24,7 @@ process DOWNLOAD {
     mkdir -p ~/.dnanexus_config
     echo '{}' > ~/.dnanexus_config/environment.json
     dx login --token "\$TOKEN" --noprojects 2>&1 || echo "Login failed"
-    dx download '${project}:/${directory}/${filename}'
+    URL=\$(dx make_download_url '${project}:/${directory}/${filename}')
+    curl -L -o ${filename} \${URL} 2>&1 | tee ${filename}.dxdownload.log
     """
 }
