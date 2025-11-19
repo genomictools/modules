@@ -10,7 +10,7 @@ process ANNOTATE {
     tuple val(cohort), val(tool), val(type),
           path(cnv), path(cnv_log),
           env(nmarkers),
-          path(ref_gene), path(ref_link), val(feature)
+          val(feature), path(feature_file)
 
     output:
     tuple val(cohort), val(tool), val(feature), val(type),
@@ -20,17 +20,17 @@ process ANNOTATE {
 
     script:
     def args = []
-    if ( feature == 'gene' ) { args << "-refgene" }
-    if ( feature == 'exon' ) { args << "-refexon" }
+    if ( feature == 'refgene' || feature == 'refexon' ) { args << "--name2" }
+    if ( feature == 'anno' ) { args << "--append" }
     def args_str = args.join(' ')
 
     """
     #!/bin/bash
     scan_region.pl \
         ${cnv} \
-        ${ref_gene} \
+        ${feature_file} \
+        --${feature} \
         ${args_str} \
-        -reflink ${ref_link} \
         > ${cohort}.${tool}.${feature}.${type} \
         2> ${cohort}.${tool}.${feature}.${type}.log
 
