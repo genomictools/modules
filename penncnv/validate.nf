@@ -7,10 +7,11 @@ process VALIDATE {
     publishDir("${params.output_dir}/tests", mode: 'copy')
 
     input:
-    tuple val(cohort), val(type), path(candidates),
+    tuple val(cohort), val(type), 
+          path(cnvr), path(candidates), path(cnvr_log), val(cnvr_nmarkers),
           val(test),
-          path(hmm),
           val(dbsnp), path(txt), path(pfb),
+          path(hmm),
           val(key), val(level), path(file), path(log), env(nmarkers)
 
     output:

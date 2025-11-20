@@ -7,12 +7,13 @@ process FAMILY {
     publishDir("${params.output_dir}/tests", mode: 'copy')
 
     input:
-    tuple val(cohort), val(tool), val(type), path(cnv),
-          val(test),
-          file(hmm),
-          val(dbsnp), path(txt), path(pfb),
+    tuple val(cohort), val(tool), val(type),
+          path(cnv), path(cnv_log), val(cnv_nmarkers),
+          val(id), val(size), val(test),
           path(pedigree),
-          val(key), val(level), path(file), path(log), env(nmarkers)
+          val(dbsnp), path(txt), path(pfb),
+          path(hmm),
+          val(key), val(level), path(file), path(log), val(nmarkers)
 
     output:
     tuple val(cohort), val(tool), val(test),
@@ -23,21 +24,12 @@ process FAMILY {
     script:
     """
     #!/bin/bash
-    N=\$(wc -l < "${pedigree}")
-    if [ "\$N" -eq 3 ]; then
-        famType="trio"
-    elif [ "\$N" -eq 4 ]; then
-        famType="quartet"
-    else
-        famType="unknown"
-    fi
-
     # Apply test
     detect_cnv.pl \
-        --\${famType} \
+        --${test} \
         --cnvfile ${cnv} \
-        --hmmfile ${hmm} \
         --pfbfile ${pfb} \
+        --hmmfile ${hmm} \
         ${file.join(' ')} \
         > ${cohort}.${tool}.${type}.${test} \
         2> ${cohort}.${tool}.${type}.${test}.log

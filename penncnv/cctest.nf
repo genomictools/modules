@@ -9,7 +9,7 @@ process CCTEST {
     input:
     tuple val(cohort), val(tool), val(type),
           path(file), path(log), val(nmarkers),
-          val(test),
+          val(id), val(size), val(test),
           path(pedigree),
           val(dbsnp), path(txt), path(pfb)
 
