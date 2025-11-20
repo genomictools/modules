@@ -13,8 +13,8 @@ process ADJUST {
 
     output:
     tuple val(cohort), val(key), val('adjusted'),
-          path("${cohort}.${key}.raw.txt.adjusted"),
-          path("${cohort}.${key}.adjusted.log"),
+          path("${file.toString()}.adjusted"),
+          path("${file.toString()}.adjusted.log"),
           env(nmarkers)
 
     script:
@@ -25,8 +25,8 @@ process ADJUST {
         -gcmodelfile ${gcm} \
         -distance ${params.distance} \
         ${file} \
-        &> ${cohort}.${key}.adjusted.log
+        &> "${file.toString()}.adjusted.log"
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.raw.txt.adjusted")
+    nmarkers=\$(wc -l < "${file.toString()}.adjusted")
     """
 }
