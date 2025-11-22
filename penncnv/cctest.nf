@@ -28,17 +28,17 @@ process CCTEST {
         """
         #!/bin/bash
         # Create phenotype file
-        # Create IID to sample name mapping from the CSV (assuming header in CSV)
-        cat ${file} | awk '{ split(\$5,a,"."); print a[1], \$5}' | sort -u > iid2name.txt
-
-        # Create phenotype.txt by replacing IID with sample name and setting case/control
-        awk 'BEGIN{
-            while((getline<"iid2name.txt")>0) map[\$1]=\$2
-        }
-        !/^#/ {
-            label = (\$NF==2 ? "case" : "control")
-            print map[\$2], label
-        }' ${pedigree} > phenotype.txt
+        awk 'NR==FNR {
+            split(\$5,a,"."); 
+            samples[a[2]]=\$5; 
+            next
+        } 
+        {
+            if(\$2 in samples) {
+                \$2 = samples[\$2]; 
+                print \$2, \$6
+            }
+        }' ${file} ${pedigree} > phenotype.txt
 
         # Apply test
         detect_cnv.pl \
