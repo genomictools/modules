@@ -10,7 +10,6 @@ process GENOTYPE {
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers)
 
-
     output:
     tuple val(cohort), val(key), val('genotype'),
           path("${cohort}.${key}.genotype.lgen"),

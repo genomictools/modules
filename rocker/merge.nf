@@ -9,7 +9,7 @@ process MERGE {
     input:
     tuple val(cohort), val(key), val(level), 
           path(file), path(log), val(nmarkers),
-          val(dbspn), path(txt), file(pfb)
+          path(pfb)
 
     output:
     tuple val(cohort), val(key), val('merged'),

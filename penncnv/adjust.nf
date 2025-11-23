@@ -9,7 +9,7 @@ process ADJUST {
     input:
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers),
-          val(dbsnp), file(gcm), file(gcm_log)
+          path(gcm)
 
     output:
     tuple val(cohort), val(key), val('adjusted'),
