@@ -10,9 +10,8 @@ process VALIDATE {
     tuple val(cohort), val(type), 
           path(cnvr), path(candidates), path(cnvr_log), val(cnvr_nmarkers),
           val(test),
-          val(dbsnp), path(txt), path(pfb),
-          path(hmm),
-          val(key), val(level), path(file), path(log), env(nmarkers)
+          val(key), val(level), path(file), path(log), env(nmarkers),
+          path(pfb)
 
     output:
     tuple val(cohort), val(type), val(test),
@@ -21,14 +20,19 @@ process VALIDATE {
           env(nmarkers)
 
     script:
+    def args = []
+    if ( type == 'cnv' ) { args << "-hmm ${file(params.hmm)}" }
+    if ( type == 'loh' ) { args << "-hmm ${file(params.hmm0)}" }
+    def args_str = args.join(' ')
+
     """
     #!/bin/bash
     # Apply test
     detect_cnv.pl \
         --validate \
         --candlist ${candidates} \
-        --hmmfile ${hmm} \
         --pfbfile ${pfb} \
+        ${args_str} \
         ${file.join(' ')} \
         > ${cohort}.${type}.${test}.tsv \
         2> ${cohort}.${type}.${test}.log

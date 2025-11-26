@@ -22,7 +22,7 @@ process MERGE {
     #!/bin/bash
     echo "MERGE ${cohort}:${key} started \$(date)" > "${cohort}.${key}.merge.log"
     
-    echo -e "SNP Name\\tChromosome\\tPosition\\tLog R Ratio\\tB Allele Frequency" > "${cohort}.${key}.merged.txt"
+    echo -e "SNP Name\\tChromosome\\tPosition\\tB Allele Frequency\\tLog R Ratio" > "${cohort}.${key}.merged.txt"
     
     # Join by first column
     join -1 1 -2 1 -t \$'\\t' -o 1.1,1.2,1.3,2.2,2.3 \\

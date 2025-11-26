@@ -10,7 +10,7 @@ process CONVERT {
     tuple val(cohort), val(key), val(tool), val(type),
           path(cnv), path(cnv_log),
           val(nmarkers),
-          val(dbspn), val(txt), file(pfb)
+          path(pfb)
 
     output:
     tuple val(cohort), val(key), val(tool), val(type),

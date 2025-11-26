@@ -27,11 +27,11 @@ process EXTRACT {
     /^\\[Data\\]/ { 
         in_header=0; 
         in_data=1; 
-        print "Name", "B Allele Freq", "Log R Ratio" > "${cohort}.${key}.raw.txt"
+        print "Name\tB Allele Freq\tLog R Ratio" > "${cohort}.${key}.raw.txt"
         next 
     }
     in_data && NF > 0 && !/^SNP Name/ {
-        print \$${params.name_col}, \$${params.baf_col}, \$${params.lrr_col} > "${cohort}.${key}.raw.txt"
+        print \$${params.name_col}"\t"\$${params.baf_col}"\t"\$${params.lrr_col} > "${cohort}.${key}.raw.txt"
         marker_count++
     }
     END {

@@ -9,7 +9,7 @@ process CLEAN {
     input:
     tuple val(cohort), val(tool), val(type),
           path(cnv), path(cnv_log), val(nmarkers),
-          val(dbsnp), path(txt), path(pfb)
+          path(pfb)
 
     output:
     tuple val(cohort), val(tool), val(type),
@@ -22,7 +22,7 @@ process CLEAN {
     #!/bin/bash
     clean_cnv.pl \
         combineseg \
-        --fraction ${params.fraction} \
+        --fraction ${params.merge_fraction} \
         --signalfile ${pfb} \
         ${cnv} \
         --output ${cohort}.${tool}.clean.${type} \

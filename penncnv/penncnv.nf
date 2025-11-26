@@ -9,8 +9,7 @@ process PENNCNV {
     input:
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers),
-          val(tool), val(type), file(hmm),
-          val(dbspn), val(txt), file(pfb)
+          val(tool), val(type), file(pfb)
           
 
     output:
@@ -21,15 +20,14 @@ process PENNCNV {
 
     script:
     def args = []
-    if ( type == 'cnv' ) { args << "-test" }
-    if ( type == 'loh' ) { args << "-test -loh" }
+    if ( type == 'cnv' ) { args << "-test -hmm ${file(params.hmm)}" }
+    if ( type == 'loh' ) { args << "-test -loh -hmm ${file(params.hmm0)}" }
     def args_str = args.join(' ')
 
     """
     #!/bin/bash
     detect_cnv.pl \
         ${args_str} \
-        -hmm ${hmm} \
         -pfb ${pfb} \
         --confidence \
         ${file} \

@@ -1,5 +1,5 @@
 process GCM {
-    tag "${dbsnp}:${chunk}"
+    tag "${dbsnp}"
 
     label 'simple'
     label 'penncnv'
@@ -12,8 +12,8 @@ process GCM {
 
     output:
     tuple val(dbsnp), val(chunk),
-          path("${dbsnp}.${chunk}.gcmodel"),
-          path("${dbsnp}.${chunk}.gcmodel.log")
+          path("${dbsnp}.gcmodel"),
+          path("${dbsnp}.gcmodel.log")
 
     script:
     """
@@ -21,10 +21,10 @@ process GCM {
     # Generate GC model
     cal_gc_snp.pl \
         <(sort -k 2,2 -k 3,3n ${gc}) \
-        <(tail -n +2 ${pfb} | awk -v OFS='\t' 'BEGIN {print "Name", "Chr", "Pos"} {print \$1, \$2, \$3}') \
+        <(tail -q -n +2 ${pfb} | awk -v OFS='\t' 'BEGIN {print "Name", "Chr", "Pos"} {print \$1, \$2, \$3}') \
         --numwindow ${params.numwindow} \
         --backgroundgc ${params.backgroundgc} \
-        --output ${dbsnp}.${chunk}.gcmodel \
-        2> ${dbsnp}.${chunk}.gcmodel.log
+        --output ${dbsnp}.gcmodel \
+        2> ${dbsnp}.gcmodel.log
     """
 }

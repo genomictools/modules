@@ -14,7 +14,7 @@ process PLINK {
 
     output:
     tuple val(cohort), val(key), val(tool), val(type),
-          path("${cohort}.${key}.${tool}.${type}.*"),
+          path("${cohort}.${key}.${tool}.${type}.hom"),
           path("${cohort}.${key}.${tool}.${type}.log"),
           env(nmarkers)
 

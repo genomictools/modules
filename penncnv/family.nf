@@ -9,19 +9,23 @@ process FAMILY {
     input:
     tuple val(cohort), val(tool), val(type),
           path(cnv), path(cnv_log), val(cnv_nmarkers),
-          val(id), val(size), val(test),
+          val(indid), val(size), val(famid), val(test),
+          val(level), path(file), path(log), val(nmarkers),
           path(pedigree),
-          val(dbsnp), path(txt), path(pfb),
-          path(hmm),
-          val(key), val(level), path(file), path(log), val(nmarkers)
+          path(pfb)
 
     output:
-    tuple val(cohort), val(tool), val(test),
+    tuple val(cohort), val(tool), val(type), val(test),
           path("${cohort}.${tool}.${type}.${test}"),
           path("${cohort}.${tool}.${type}.${test}.log"),
           env(nmarkers)
 
     script:
+    def args = []
+    if ( type == 'cnv' ) { args << "-hmm ${file(params.hmm)}" }
+    if ( type == 'loh' ) { args << "-hmm ${file(params.hmm0)}" }
+    def args_str = args.join(' ')
+
     """
     #!/bin/bash
     # Apply test
@@ -29,7 +33,7 @@ process FAMILY {
         --${test} \
         --cnvfile ${cnv} \
         --pfbfile ${pfb} \
-        --hmmfile ${hmm} \
+        ${args_str} \
         ${file.join(' ')} \
         > ${cohort}.${tool}.${type}.${test} \
         2> ${cohort}.${tool}.${type}.${test}.log

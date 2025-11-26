@@ -8,8 +8,7 @@ process EXCLUDE {
 
     input:
     tuple val(cohort), val(tool), val(type),
-          path(cnv), path(cnv_log), val(nmarkers),
-          path(exclude)
+          path(cnv), path(cnv_log), val(nmarkers)
 
     output:
     tuple val(cohort), val(tool), val(type),
@@ -23,8 +22,8 @@ process EXCLUDE {
     # get regions
     scan_region.pl \
         ${cnv} \
-        ${exclude} \
-        -minqueryfrac 0.5 \
+        ${file(params.exclude_regions)} \
+        -minqueryfrac ${params.exclude_fraction} \
         > to_remove.txt \
         &> ${cohort}.${tool}.excluded.${type}.log
 
