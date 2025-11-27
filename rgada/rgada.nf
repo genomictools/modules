@@ -9,12 +9,12 @@ process RGADA {
     input:
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers),
-          val(tool), val(type)
+          val(tool)
           
 
     output:
-    tuple val(cohort), val(key), val(tool), val(type),
-          path("${cohort}.${key}.${tool}.{cnv,loh}"),
+    tuple val(cohort), val(key), val(tool),
+          path("${cohort}.${key}.${tool}.cnv"),
           path("${cohort}.${key}.${tool}.log"),
           env(nmarkers)
 
@@ -25,7 +25,7 @@ process RGADA {
     RGadaIndividual.R ${file} ${params.a_alpha} ${params.t_statistic} ${params.min_seg_length} ${cohort}.${key}.${tool} >& ${cohort}.${key}.${tool}.log
 
     # Count the number of markers
-	nmarkers="\$(wc -l < "${cohort}.${key}.${tool}.cnv"),\$(wc -l < "${cohort}.${key}.${tool}.loh")"
+	nmarkers="\$(wc -l < "${cohort}.${key}.${tool}.cnv")"
 	"""
 }
 

@@ -4,7 +4,7 @@ process GENOTYPE {
     label 'simple'
     label 'rocker'
 
-    publishDir("${params.output_dir}/signal", mode: 'copy')
+    publishDir("${params.output_dir}/genotypes", mode: 'copy')
 
     input:
     tuple val(cohort), val(key), val(level),
@@ -14,7 +14,9 @@ process GENOTYPE {
 
     output:
     tuple val(cohort), val(key), val('genotype'),
-          path("${cohort}.${key}.genotype.{lgen,map,fam}"),
+          path("${cohort}.${key}.genotype.lgen"),
+          path("${cohort}.${key}.genotype.map"),
+          path("${cohort}.${key}.genotype.fam"),
           path("${cohort}.${key}.genotype.log"),
           env(nmarkers)
 

@@ -1,5 +1,5 @@
 process REPORT {
-    tag "${cohort}:${tool}:${type}"
+    tag "${cohort}:${tool}"
 
     label 'simple'
     label 'penncnv'
@@ -7,12 +7,12 @@ process REPORT {
     publishDir("${params.output_dir}/report", mode: 'copy')
 
     input:
-    tuple val(cohort), val(tool), val(type),
+    tuple val(cohort), val(tool),
           path(cnv), path(cnv_log), val(nmarkers)
 
     output:
-    tuple val(cohort), val(tool), val(type),
-          path("${cohort}.${tool}.${type}.report.tsv")
+    tuple val(cohort), val(tool),
+          path("${cohort}.${tool}.report.tsv")
 
     script:
     """
@@ -20,6 +20,6 @@ process REPORT {
     filter_cnv.pl \
         ${cnv} \
         --qclogfile ${cnv_log} \
-        --qcsumout ${cohort}.${tool}.${type}.report.tsv
+        --qcsumout ${cohort}.${tool}.report.tsv
     """
 }

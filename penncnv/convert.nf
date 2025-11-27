@@ -1,5 +1,5 @@
 process CONVERT {
-    tag "${cohort}:${tool}:${type}"
+    tag "${cohort}:${tool}"
 
     label 'simple'
     label 'penncnv'
@@ -7,15 +7,13 @@ process CONVERT {
     publishDir("${params.output_dir}/${tool}", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(tool), val(type),
-          path(cnv), path(cnv_log),
-          val(nmarkers),
+    tuple val(cohort), val(tool), path(cnv),
           path(pfb)
 
     output:
-    tuple val(cohort), val(key), val(tool), val(type),
-          path("${cohort}.${key}.${tool}.converted.${type}"),
-          path("${cohort}.${key}.${tool}.converted.${type}.log"),
+    tuple val(cohort), val(tool),
+          path("${cohort}.${tool}.converted.cnv"),
+          path("${cohort}.${tool}.converted.cnv.log"),
           env(nmarkers)
 
     script:
@@ -27,9 +25,9 @@ process CONVERT {
         -intype birdseye \
         -outtype penncnv \
         ${cnv} \
-        > ${cohort}.${key}.${tool}.converted.${type} \
-        2> ${cohort}.${key}.${tool}.converted.${type}.log
+        > ${cohort}.${tool}.converted.cnv \
+        2> ${cohort}.${tool}.converted.cnv.log
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.${tool}.converted.${type}")
+    nmarkers=\$(wc -l < "${cohort}.${tool}.converted.cnv")
     """
 }

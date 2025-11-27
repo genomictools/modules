@@ -20,11 +20,6 @@ process VALIDATE {
           env(nmarkers)
 
     script:
-    def args = []
-    if ( type == 'cnv' ) { args << "-hmm ${file(params.hmm)}" }
-    if ( type == 'loh' ) { args << "-hmm ${file(params.hmm0)}" }
-    def args_str = args.join(' ')
-
     """
     #!/bin/bash
     # Apply test
@@ -32,7 +27,7 @@ process VALIDATE {
         --validate \
         --candlist ${candidates} \
         --pfbfile ${pfb} \
-        ${args_str} \
+        --hmmfile ${file(params.hmm)} \
         ${file.join(' ')} \
         > ${cohort}.${type}.${test}.tsv \
         2> ${cohort}.${type}.${test}.log

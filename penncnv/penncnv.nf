@@ -1,5 +1,5 @@
 process PENNCNV {
-    tag "${cohort}:${key}:${tool}:${type}"
+    tag "${cohort}:${key}:${tool}"
 
     label 'simple'
     label 'penncnv'
@@ -9,31 +9,27 @@ process PENNCNV {
     input:
     tuple val(cohort), val(key), val(level),
           path(file), path(log), val(nmarkers),
-          val(tool), val(type), file(pfb)
-          
+          val(tool), file(pfb)
 
     output:
-    tuple val(cohort), val(key), val(tool), val(type),
-          path("${cohort}.${key}.${tool}.${type}"),
-          path("${cohort}.${key}.${tool}.${type}.log"),
+    tuple val(cohort), val(key), val(tool),
+          path("${cohort}.${key}.${tool}.cnv"),
+          path("${cohort}.${key}.${tool}.log"),
           env(nmarkers)
 
     script:
-    def args = []
-    if ( type == 'cnv' ) { args << "-test -hmm ${file(params.hmm)}" }
-    if ( type == 'loh' ) { args << "-test -loh -hmm ${file(params.hmm0)}" }
-    def args_str = args.join(' ')
-
     """
     #!/bin/bash
     detect_cnv.pl \
-        ${args_str} \
-        -pfb ${pfb} \
-        --confidence \
         ${file} \
-        -log ${cohort}.${key}.${tool}.${type}.log \
-        -out ${cohort}.${key}.${tool}.${type}
+        -test -loh --confidence \
+        -hmm ${file(params.hmm)} \
+        -pfb ${pfb} \
+        -log ${cohort}.${key}.${tool}.log \
+        -out ${cohort}.${key}.${tool}.cnv
 
-    nmarkers=\$(wc -l < "${cohort}.${key}.${tool}.${type}")
+    nmarkers=\$(wc -l < "${cohort}.${key}.${tool}.cnv")
     """
 }
+
+    // -gcmodel ${gcm} \

@@ -21,19 +21,14 @@ process FAMILY {
           env(nmarkers)
 
     script:
-    def args = []
-    if ( type == 'cnv' ) { args << "-hmm ${file(params.hmm)}" }
-    if ( type == 'loh' ) { args << "-hmm ${file(params.hmm0)}" }
-    def args_str = args.join(' ')
-
     """
     #!/bin/bash
     # Apply test
     detect_cnv.pl \
-        --${test} \
+        --${test} --loh \
         --cnvfile ${cnv} \
         --pfbfile ${pfb} \
-        ${args_str} \
+        -hmm ${file(params.hmm)} \
         ${file.join(' ')} \
         > ${cohort}.${tool}.${type}.${test} \
         2> ${cohort}.${tool}.${type}.${test}.log
