@@ -13,7 +13,7 @@ process ROH {
 
     output:
     tuple val(cohort), val(key), val(level),
-          path("${cohort}.${key}.${level}.hom"),
+          path("${cohort}.${key}.${level}.roh.hom"),
           path("${cohort}.${key}.${level}.roh.log"),
           env(nmarkers)
 
@@ -28,8 +28,7 @@ process ROH {
       --homozyg-kb ${params.length.toInteger() / 1000} \
       --homozyg-gap ${params.maxlength.toInteger() / 1000} \
       -lfile ${lgen.baseName} \
-      --out "${cohort}.${key}.${level}" \
-      >> "${cohort}.${key}.${level}.roh.log" 2>&1
+      --out "${cohort}.${key}.${level}.roh"
 
     # Count the number of markers
     nmarkers=\$(wc -l < "${cohort}.${key}.${level}.hom")
