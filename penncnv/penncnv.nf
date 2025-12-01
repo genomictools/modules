@@ -1,5 +1,5 @@
 process PENNCNV {
-    tag "${cohort}:${key}:${tool}"
+    tag "${cohort}:${key}:${level}"
 
     label 'simple'
     label 'penncnv'

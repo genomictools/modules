@@ -29,9 +29,10 @@ process QUANTISNP {
 		--levels ${file(params.quant_ratios)} \
 		--lsetting ${params.lsetting} \
 		--emiters ${params.emiters} \
+		--doXcorrect \
 		--outdir . \
 		--sampleid ${file.name} \
-		2> ${cohort}.${key}.${tool}.log
+		--logfile ${cohort}.${key}.${tool}.log
 
 	# Convert to birdseye format
 	tail -q -n +2 ${file.name}.cnv  ${file.name}.loh | \

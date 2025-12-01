@@ -1,5 +1,5 @@
 process RGADA {
-    tag "${cohort}:${key}:${tool}"
+    tag "${cohort}:${key}:${level}"
 
     label 'simple'
     label 'rgada'
@@ -22,9 +22,8 @@ process RGADA {
     """
     #!/bin/bash
     # Call GADA
-    RGadaIndividual.R ${file} ${params.a_alpha} ${params.t_statistic} ${params.min_seg_length} ${cohort}.${key}.${tool} >& ${cohort}.${key}.${tool}.log
-
-    # Count the number of markers
+    RGadaIndividual.R ${file} ${params.a_alpha} ${params.t_statistic} ${params.numsnp} ${cohort}.${key}.${tool} >& ${cohort}.${key}.${tool}.log
+	# Count the number of markers
 	nmarkers="\$(wc -l < "${cohort}.${key}.${tool}.cnv")"
 	"""
 }

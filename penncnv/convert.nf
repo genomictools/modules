@@ -21,7 +21,7 @@ process CONVERT {
     #!/bin/bash
     # Convert to penncnv
     convert_cnv.pl \
-        -snplocfile <(tail -n+2 ${pfb} | awk 'BEGIN{ print "Name\tChr\tPos"}1') \
+        -snplocfile <(tail -n+2 ${pfb} | awk 'BEGIN{OFS = "\t"; print "Name", "Chr", "Pos"}; {OFS = "\t"; print \$1, \$2, \$3}') \
         -intype birdseye \
         -outtype penncnv \
         ${cnv} \
