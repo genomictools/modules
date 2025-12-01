@@ -14,24 +14,13 @@ process MERGE {
     output:
     tuple val(cohort), val(key), val('merged'),
           path("${cohort}.${key}.merged.txt"),
-          path("${cohort}.${key}.merge.log"),
+          path("${cohort}.${key}.merged.log"),
           env(nmarkers)
 
     script:
     """
     #!/bin/bash
-    echo "MERGE ${cohort}:${key} started \$(date)" > "${cohort}.${key}.merge.log"
-    
-    echo -e "SNP Name\\tChromosome\\tPosition\\tB Allele Frequency\\tLog R Ratio" > "${cohort}.${key}.merged.txt"
-    
-    # Join by first column
-    join -1 1 -2 1 -t \$'\\t' -o 1.1,1.2,1.3,2.2,2.3 \\
-        <(sort -k1,1 ${pfb}) \\
-        <(sort -k1,1 ${file}) \\
-        >> "${cohort}.${key}.merged.txt"
-    
+    merge.R ${file} ${pfb} ${cohort}.${key}.merged.txt >& ${cohort}.${key}.merged.log
     nmarkers=\$(tail -n +2 "${cohort}.${key}.merged.txt" | wc -l)
-    echo "Markers merged: \$nmarkers" >> "${cohort}.${key}.merge.log"
-    echo "MERGE ${cohort}:${key} completed \$(date)" >> "${cohort}.${key}.merge.log"
     """
 }
