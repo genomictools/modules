@@ -23,7 +23,7 @@ process EXCLUDE {
     scan_region.pl \
         ${cnv} \
         ${file(params.exclude_regions)} \
-        -minqueryfrac ${params.exclude_fraction} \
+        -minqueryfrac ${params.fraction} \
         > to_remove.txt \
         &> ${cohort}.${tool}.excluded.${type}.log
 

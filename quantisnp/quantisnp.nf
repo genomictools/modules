@@ -18,11 +18,6 @@ process QUANTISNP {
           env(nmarkers)
 
     script:
-    def args = []
-    if ( params.genotype )   { args << "--genotype" }
-    if ( params.doXcorrect ) { args << "--doXcorrect" }
-    def args_str = args.join(' ')
-
     """
     #!/bin/bash
 	# Run Quantisnp
@@ -36,7 +31,6 @@ process QUANTISNP {
 		--emiters ${params.emiters} \
 		--outdir . \
 		--sampleid ${file.name} \
-		${args_str} \
 		2> ${cohort}.${key}.${tool}.log
 
 	# Convert to birdseye format

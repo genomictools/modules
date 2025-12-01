@@ -22,7 +22,7 @@ process CLEAN {
     #!/bin/bash
     clean_cnv.pl \
         combineseg \
-        --fraction ${params.merge_fraction} \
+        --fraction ${params.fraction} \
         --signalfile ${pfb} \
         ${cnv} \
         --output ${cohort}.${tool}.clean.${type} \

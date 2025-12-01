@@ -23,7 +23,7 @@ process CNVR {
     """
     #!/bin/bash
     # Create cnvr
-    cnvr.R ${cohort} ${tool.join(',')} ${cnv.join(',')} ${params.overlap} ${cohort_size} 2> ${cohort}.cnvr.log
+    cnvr.R ${cohort} ${tool.join(',')} ${cnv.join(',')} ${params.fraction} ${cohort_size} 2> ${cohort}.cnvr.log
 
     nmarkers=\$(wc -l < "${cohort}.cnvr.tsv")
     """

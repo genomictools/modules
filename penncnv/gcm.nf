@@ -22,7 +22,7 @@ process GCM {
     cal_gc_snp.pl \
         <(sort -k 2,2 -k 3,3n ${gc}) \
         <(tail -q -n +2 ${pfb} | awk -v OFS='\t' 'BEGIN {print "Name", "Chr", "Pos"} {print \$1, \$2, \$3}') \
-        --numwindow ${params.numwindow} \
+        --numwindow ${params.numsnp} \
         --backgroundgc ${params.backgroundgc} \
         --output ${dbsnp}.gcmodel \
         2> ${dbsnp}.gcmodel.log
