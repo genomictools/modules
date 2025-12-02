@@ -1,5 +1,5 @@
 process ROH {
-    tag "${cohort}:${key}:${level}"
+    tag "${cohort}:${tool}"
 
     label 'simple'
     label 'plink'
@@ -7,14 +7,14 @@ process ROH {
     publishDir("${params.output_dir}/roh", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(level),
+    tuple val(cohort), val(tool),
           path(lgen), path(map), path(fam), path(log),
           val(nmarkers)
 
     output:
-    tuple val(cohort), val(key), val(level),
-          path("${cohort}.${key}.${level}.roh.hom"),
-          path("${cohort}.${key}.${level}.roh.log"),
+    tuple val(cohort), val(tool),
+          path("${cohort}.${tool}.roh.hom"),
+          path("${cohort}.${tool}.roh.log"),
           env(nmarkers)
 
     script:
@@ -28,9 +28,9 @@ process ROH {
       --homozyg-kb ${params.length.toInteger() / 1000} \
       --homozyg-gap ${params.maxlength.toInteger() / 1000} \
       -lfile ${lgen.baseName} \
-      --out "${cohort}.${key}.${level}.roh"
+      --out "${cohort}.${tool}.roh"
 
     # Count the number of markers
-    nmarkers=\$(wc -l < "${cohort}.${key}.${level}.hom")
+    nmarkers=\$(wc -l < "${cohort}.${tool}.roh.hom")
     """
 }
