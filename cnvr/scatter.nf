@@ -7,9 +7,9 @@ process SCATTER {
     publishDir("${params.output_dir}/scatter", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(level), path(signal), path(signal_log), val(signal_nmarkers),
-          val(type), val(tool),
-          val(feature), val(feature_list), val(region),
+    tuple val(cohort), val(key), val(type), val(tool), val(region),
+          val(feature), val(feature_list), val(n_features),
+          val(level), path(signal), path(signal_log), val(signal_nmarkers),
        	  path(pfb)
 
     output:
