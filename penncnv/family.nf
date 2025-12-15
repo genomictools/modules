@@ -25,7 +25,7 @@ process FAMILY {
     #!/bin/bash
     # Apply test
     detect_cnv.pl \
-        --${test} --loh \
+        --${test} \
         --cnvfile ${cnv} \
         --pfbfile ${pfb} \
         -hmm ${file(params.hmm)} \

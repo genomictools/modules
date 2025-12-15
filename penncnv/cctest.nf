@@ -28,17 +28,11 @@ process CCTEST {
         """
         #!/bin/bash
         # Create phenotype file
-        awk 'NR==FNR {
-            split(\$5,a,"."); 
-            samples[a[2]]=\$5; 
-            next
-        } 
-        {
-            if(\$2 in samples) {
-                \$2 = samples[\$2]; 
-                print \$2, \$6
-            }
-        }' ${file} ${pedigree} > phenotype.txt
+        cat ${file} | \
+            awk '{print \$5}' | \
+            sort -u | \
+            grep -wFf - ${pedigree} |\
+            awk '{print \$2, \$6}' > phenotype.txt
 
         # Apply test
         detect_cnv.pl \
