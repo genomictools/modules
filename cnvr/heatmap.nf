@@ -9,7 +9,7 @@ process HEATMAP {
     input:
     tuple val(cohort), val(tool), val(feature), val(type),
           path(cnv), path(cnv_log), val(cnv_nmarkers),
-          val(features), val(feature_list)
+          val(feature_list)
 
     output:
     tuple val(cohort), val(tool), val(feature), val(type),
@@ -19,6 +19,6 @@ process HEATMAP {
     script:
     """
     #!/bin/bash
-    heatmap.R ${cohort} ${tool} ${feature} ${cnv} ${type} ${feature_list.join(',')} ${params.n_samples} ${params.n_genes} 2> ${cohort}.${tool}.${feature}.${type}.heatmap.log
+    heatmap.R ${cohort} ${tool} ${feature} ${type} ${cnv} ${feature_list.join(',')} ${params.n_samples} ${params.n_genes} 2> ${cohort}.${tool}.${feature}.${type}.heatmap.log
     """
 }
