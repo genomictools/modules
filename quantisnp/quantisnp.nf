@@ -19,8 +19,8 @@ process QUANTISNP {
     script:
     """
     #!/bin/bash
-	# Get unique chromosome list
-	chroms=\$(tail -n +2 ${file} | awk '{print \$2}' | sort -un | tr '\n' ',')
+	# Get unique chromosome list (numeric chromosomes only)
+	chroms=\$(tail -n +2 ${file} | awk '{print \$2}' | grep -E '^[0-9]+\$' | sort -un | tr '\n' ',')
 
 	# Run Quantisnp
 	export MCR_CACHE_ROOT="./"
@@ -32,7 +32,6 @@ process QUANTISNP {
 		--lsetting ${params.lsetting} \
 		--emiters ${params.emiters} \
 		--chr "\${chroms}" \
-		--doXcorrect \
 		--genotype \
 		--outdir . \
 		--sampleid ${file.name} \
