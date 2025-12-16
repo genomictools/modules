@@ -2,7 +2,7 @@ process GTC2VCF {
     tag "${cohort}:${key}:${level}"
 
     label 'simple'
-    label 'bcftools2'
+    label 'bcftools'
 
     publishDir("${params.output_dir}/signal", mode: 'copy')
 
