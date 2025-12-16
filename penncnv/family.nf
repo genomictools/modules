@@ -23,13 +23,22 @@ process FAMILY {
     script:
     """
     #!/bin/bash
+    # Create symlinks to match pedigree sample names
+    for f in ${file.join(' ')}; do
+        sample_name=\$(basename "\$f" .txt.adjusted)
+        ln -s "\$f" "\${sample_name}"
+    done
+
+    # Get linked file names for detect_cnv.pl
+    linked_files=\$(for f in ${file.join(' ')}; do basename "\$f" .txt.adjusted; done)
+
     # Apply test
     detect_cnv.pl \
         --${test} \
         --cnvfile ${cnv} \
         --pfbfile ${pfb} \
         -hmm ${file(params.hmm)} \
-        ${file.join(' ')} \
+        \$linked_files \
         > ${cohort}.${tool}.${type}.${test} \
         2> ${cohort}.${tool}.${type}.${test}.log
 
