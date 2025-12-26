@@ -20,6 +20,6 @@ process SCATTER {
     script:
     """
     #!/bin/bash
-    scatter.R ${signal} ${feature} ${feature_list.join(',')} ${region} ${pfb} ${cohort}.${key}.${type}.${tool}.${feature}.${feature_list.join('_')}.${region} 2> ${cohort}.${key}.${type}.${tool}.${feature}.${feature_list.join('_')}.${region}.log
+    scatter.R ${signal} ${feature} ${feature_list.join(',')} ${region} ${pfb} ${file(params.anno)} ${cohort}.${key}.${type}.${tool}.${feature}.${feature_list.join('_')}.${region} 2> ${cohort}.${key}.${type}.${tool}.${feature}.${feature_list.join('_')}.${region}.log
     """
 }
