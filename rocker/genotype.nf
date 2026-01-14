@@ -35,8 +35,12 @@ process GENOTYPE {
     awk 'NR==FNR {fam[\$2]=\$1; next} 
          {if(\$2 in fam) \$1=fam[\$2]; print}' \
          OFS="\\t" "${cohort}.${tool}.fam" ${file} | \
-    sed 's/-/0/g; s/N/0/g' | \
     awk '{
+        # Replace missing alleles only in genotype fields (columns >= 3)
+        for(i=4; i<=NF; i++) {
+            if(\$i == "-" || \$i == "N") \$i = "0"
+        }
+        # If one allele in a pair is missing, set both to 0
         for(i=3; i<=NF; i+=2) {
             if(\$i == "0" || \$(i+1) == "0") {
                 \$i = "0"; \$(i+1) = "0"
