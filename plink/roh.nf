@@ -8,8 +8,8 @@ process ROH {
 
     input:
     tuple val(cohort), val(tool),
-          path(lgen), path(map), path(fam), path(log),
-          val(nmarkers)
+          path(bim), path(bed), path(fam), path(log),
+          env(n_samples), env(n_variants)
 
     output:
     tuple val(cohort), val(tool),
@@ -27,7 +27,7 @@ process ROH {
       --homozyg-window-snp ${params.window} \
       --homozyg-kb ${params.length.toInteger() / 1000} \
       --homozyg-gap ${params.maxlength.toInteger() / 1000} \
-      -lfile ${lgen.baseName} \
+      -bfile ${bim.baseName} \
       --out "${cohort}.${tool}.roh"
 
     # Count the number of markers

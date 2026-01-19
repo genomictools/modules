@@ -8,8 +8,8 @@ process RELATIONS {
 
     input:
     tuple val(cohort), val(tool),
-          path(lgen), path(map), path(fam), path(log),
-          val(nmarkers)
+          path(bim), path(bed), path(fam), path(log),
+          env(n_samples), env(n_variants)
 
     output:
     tuple val(cohort), val(tool),
@@ -20,7 +20,7 @@ process RELATIONS {
     #!/bin/bash
     plink \
       --make-rel square0 \
-      -lfile ${lgen.baseName} \
+      -bfile ${bim.baseName} \
       --out "${cohort}.${tool}.relations"
     """
 }

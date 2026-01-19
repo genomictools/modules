@@ -1,32 +1,30 @@
 process GENOTYPE {
-    tag "${cohort}:${tool}"
+    tag "${cohort}:${tool}:${key}"
 
     label 'simple'
-    label 'rocker'
+    label 'plink'
 
     publishDir("${params.output_dir}/genotypes", mode: 'copy')
 
     input:
-    tuple val(cohort), val(tool), val(type),
+    tuple val(cohort), val(key), val(tool), val(type),
           path(file), val(nmarkers),
           path(pfb),
           path(pedigree)
 
     output:
-    tuple val(cohort), val(tool),
-          path("${cohort}.${tool}.lgen"),
-          path("${cohort}.${tool}.map"),
-          path("${cohort}.${tool}.fam"),
-          path("${cohort}.${tool}.log"),
-          env(nmarkers)
+    tuple val(cohort), val(tool), val(key),
+          path("${cohort}.${key}.${tool}.bim"),
+          path("${cohort}.${key}.${tool}.bed"),
+          path("${cohort}.${key}.${tool}.fam"),
+          path("${cohort}.${key}.${tool}.log"),
+          env(n_samples), env(n_variants)
 
     script:
     """
     #!/bin/bash
     # Create .fam file from pedigree
-    cat ${file} | cut -f 2 | sort -u | \
-    grep -wFf - ${pedigree} \
-    > "${cohort}.${tool}.fam"
+    awk '\$2 == "${key}"' ${pedigree} > "${cohort}.${key}.${tool}.tmp.fam"
     
     # Create .lgen file from genotype file
     # Update the family ids based on .fam file
@@ -34,7 +32,7 @@ process GENOTYPE {
     # If one allele is missing, replace both with 0
     awk 'NR==FNR {fam[\$2]=\$1; next} 
          {if(\$2 in fam) \$1=fam[\$2]; print}' \
-         OFS="\\t" "${cohort}.${tool}.fam" ${file} | \
+         OFS="\\t" "${cohort}.${key}.${tool}.tmp.fam" ${file} | \
     awk '{
         # Replace missing alleles only in genotype fields (columns >= 3)
         for(i=4; i<=NF; i++) {
@@ -48,7 +46,7 @@ process GENOTYPE {
         }
         print
     }' OFS="\\t" \
-    > "${cohort}.${tool}.lgen"
+    > "${cohort}.${key}.${tool}.tmp.lgen"
 
     # Create a map file from pfb
     tail -n +2 ${pfb} | \
@@ -57,12 +55,18 @@ process GENOTYPE {
     {
         print \$2, \$1, "0", \$3
     }
-    ' > "${cohort}.${tool}.map"
+    ' > "${cohort}.${key}.${tool}.tmp.map"
     
+    # Conver to plink binary files
+    plink \
+        --make-bed \
+        --lgen ${cohort}.${key}.${tool}.tmp.lgen\
+        --map ${cohort}.${key}.${tool}.tmp.map \
+        --fam ${cohort}.${key}.${tool}.tmp.fam \
+        --out ${cohort}.${key}.${tool}
+
     # Count markers
-    nmarkers=\$(wc -l < "${cohort}.${tool}.lgen")
-    
-    # Log
-    echo "Processed ${cohort}.${tool}" > "${cohort}.${tool}.log"
+    n_samples=\$(wc -l < "${cohort}.${key}.${tool}.fam")
+    n_variants=\$(wc -l < "${cohort}.${key}.${tool}.bim")
     """
 }

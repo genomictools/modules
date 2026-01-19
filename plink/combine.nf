@@ -1,40 +1,50 @@
 process COMBINE {
-    tag "${cohort}:${level}"
+    tag "${cohort}:${category}"
 
     label 'simple'
     label 'plink'
 
-    publishDir("${params.output_dir}/genotypes", mode: 'copy')
+    publishDir("${params.output_dir}/combined", mode: 'copy')
 
     input:
-    tuple val(cohort), val(key), val(level),
+    tuple val(cohort), val(category), val(key),
           path(bim), path(bed), path(fam), path(log),
-          val(n_variants)
+          val(n_samples), val(n_variants)
 
     output:
-    tuple val(cohort), val(level),
-          path("${cohort}.${level}.combined.*"),
-          env(n_variants)
+    tuple val(cohort), val(category),
+          path("${cohort}.${category}.bim"),
+          path("${cohort}.${category}.bed"),
+          path("${cohort}.${category}.fam"),
+          path("${cohort}.${category}.log"),
+          env(n_samples), env(n_variants)
 
     script:
     """
     #!/bin/bash
     # Create a list of all files
-    paste -d ' ' <(echo "${bed.join('\n')}") <(echo "${bim.join('\n')}") <(echo "${fam.join('\n')}") | sort -V > allfiles.txt
+    echo "${bed.join('\n')}" > bed.txt
+    echo "${bim.join('\n')}" > bim.txt
+    echo "${fam.join('\n')}" > fam.txt
+    paste -d ' ' bed.txt bim.txt fam.txt | sort -V > allfiles.txt
 
     # Merge all files
     plink \
-        --flip-scan \
+        --list-duplicate-vars \
         --write-snplist \
         --merge-list allfiles.txt \
         --out first_pass
 
+    if [ ! -f first_pass.dupvar ]; then touch first_pass.dupvar; fi
+
     plink \
         --make-bed \
-        --flip first_pass.missnp \
+        --exclude first_pass.dupvar \
         --merge-list allfiles.txt \
-        --out ${cohort}.${level}.combined
+        --allow-no-sex \
+        --out ${cohort}.${category}
 
-    n_variants=\$(wc -l < "${cohort}.${level}.combined.bim")
+    n_samples=\$(wc -l < "${cohort}.${category}.fam")
+    n_variants=\$(wc -l < "${cohort}.${category}.bim")
     """
 }
