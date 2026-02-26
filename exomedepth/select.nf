@@ -18,6 +18,6 @@ process SELECT {
     script:
     """
     #!/bin/bash
-    select_ref.R ${test_counts} ${ref_counts.join(',')} ${params.bins} ${cohort}.${key}.stats.tsv
+    select_ref.R ${key} ${test_counts} ${ref.join(',')} ${ref_counts.join(',')} ${params.bins} ${cohort}.${key}.stats.tsv
     """
 }

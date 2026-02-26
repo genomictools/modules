@@ -8,7 +8,7 @@ process VISUALIZE {
 
     input:
     tuple val(cohort), val(gene), val(key),
-          path(exons), path(bam), path(bai)
+          val(samples), path(coverage)
 
     output:
     tuple val(cohort), val(gene), val(key),
@@ -17,6 +17,6 @@ process VISUALIZE {
     script:
     """
     #!/bin/bash
-    visualize_bam.R ${gene} ${key} ${exons} ${bam.join(',')} ${cohort}.${gene}.${key}.cov.png
+    visualize_bam.R ${cohort} ${gene} ${key} ${samples.join(',')} ${coverage.join(',')} ${cohort}.${gene}.${key}.cov.png
     """
 }

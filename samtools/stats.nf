@@ -12,15 +12,17 @@ process STATS {
     
     output:
     tuple val(cohort), val(key), val(type),
-          path("${cohort}.${key}.${type}.*.stats.tsv")
+          path("${cohort}.${key}.${type}.*.txt")
 
     script:
     """
     #!/bin/bash
-    samtools stats ${bam} > samtools.stats.txt 
-    TAGS="CHK SN FFQ LFQ GCF GCL GCC GCT FBC FTC LBC LTC BCC CRC OXC RXC MPC QTQ CYQ BZQ QXQ IS RL FRL LRL MAPQ ID IC COV GCD RFS"
-    for TAG in \${TAGS}; do
-        grep ^\${TAG} samtools.stats.txt | cut -f 2- > ${cohort}.${key}.${type}.\${TAG}.stats.tsv
-    done
+    samtools flagstat ${bam} > ${cohort}.${key}.${type}.flagstats.txt
     """
 }
+
+    // samtools stats ${bam} > samtools.txt 
+    // TAGS="CHK SN FFQ LFQ GCF GCL GCC GCT FBC FTC LBC LTC BCC CRC OXC RXC MPC QTQ CYQ BZQ QXQ IS RL FRL LRL MAPQ ID IC COV GCD RFS"
+    // for TAG in \${TAGS}; do
+    //     grep ^\${TAG} samtools.txt | cut -f 2- > ${cohort}.${key}.${type}.\${TAG}.txt
+    // done
