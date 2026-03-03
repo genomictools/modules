@@ -7,11 +7,11 @@ process PLOT {
     publishDir("${params.output_dir}/plots/exome_copy", mode: 'copy')
 
     input:
-    tuple val(cohort), val(gene), val(test_key), 
-          val(obj), path(tsv), val(nmarkers)
+    tuple val(cohort), val(gene), val(test_key), val(tool),
+          path(tsv), val(obj), val(nmarkers)
 
     output:
-    tuple val(cohort), val(gene), val(test_key), 
+    tuple val(cohort), val(gene), val(test_key), val(tool),
           path("${cohort}.${gene}.${test_key}.cnv.png")
 
     script:

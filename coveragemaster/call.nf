@@ -13,8 +13,11 @@ process CALL {
           path(ref_list), path(ref_aggregate)
 
     output:
-    tuple val(cohort), val(gene), val(key), 
-          path("${cohort}.${gene}.${key}.{CMcalls,CMreport,CMpositives.pdf,CM.log}")
+    tuple val(cohort), val(gene), val(key), val("coveragemaster"),
+          path("${cohort}.${gene}.${key}.CMcalls"),
+          path("${cohort}.${gene}.${key}.CMreport"),
+          path("${cohort}.${gene}.${key}.CMpositives.pdf"),
+          path("${cohort}.${gene}.${key}.CM.log")
 
     script:
     """

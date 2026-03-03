@@ -7,12 +7,12 @@ process PLOT {
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
     input:
-    tuple val(cohort), val(gene), val(key),
-          path(obj), path(cnv),
-          val(nmarker)
+    tuple val(cohort), val(gene), val(key), val(tool),
+		  path(cnv), path(obj),
+    	  val(nmarker)
 
     output:
-    tuple val(cohort), val(gene), val(key),
+    tuple val(cohort), val(gene), val(key), val(tool),
           path("${cohort}.${gene}.${key}.cnv.png")
 
     script:

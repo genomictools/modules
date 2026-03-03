@@ -12,9 +12,9 @@ process CALL {
           path(ref_counts)
 
     output:
-    tuple val(cohort), val(gene), val(key), 
-          path("${cohort}.${gene}.${key}.cnv.rds"),
+    tuple val(cohort), val(gene), val(key), val("exomedepth"),
           path("${cohort}.${gene}.${key}.cnv.tsv"),
+          path("${cohort}.${gene}.${key}.cnv.rds"),
           env(nmarker)
 
     script:

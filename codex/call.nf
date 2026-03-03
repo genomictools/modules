@@ -12,7 +12,7 @@ process CALL {
           val(ref_key), path(ref_counts)
 
     output:
-    tuple val(cohort), val(gene), val(test_key), 
+    tuple val(cohort), val(gene), val(test_key), val("codex"),
           path("${cohort}.${gene}.${test_key}.cnv.tsv"),
           env(nmarker)
 
