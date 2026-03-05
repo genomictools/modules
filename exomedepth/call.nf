@@ -15,12 +15,13 @@ process CALL {
     tuple val(cohort), val(gene), val(key), val("exomedepth"),
           path("${cohort}.${gene}.${key}.cnv.tsv"),
           path("${cohort}.${gene}.${key}.cnv.rds"),
+          path("${cohort}.${gene}.${key}.cnv.png"),
           env(nmarker)
 
     script:
     """
     #!/bin/bash
-    call_cnv.R ${cohort} ${gene} ${key} ${test_counts} ${ref_counts.join(',')} ${params.prob}
+    exomedepth.R ${cohort} ${gene} ${key} ${test_counts} ${ref_counts.join(',')} ${params.prob}
 	nmarker=\$(grep -v '^#' ${cohort}.${gene}.${key}.cnv.tsv | wc -l)
     """
 }
