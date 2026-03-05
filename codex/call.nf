@@ -14,6 +14,7 @@ process CALL {
     output:
     tuple val(cohort), val(gene), val(test_key), val("codex"),
           path("${cohort}.${gene}.${test_key}.cnv.tsv"),
+          path("${cohort}.${gene}.${test_key}.cnv.png"),
           env(nmarker)
 
     script:
