@@ -1,5 +1,5 @@
 process VISUALIZE {
-    tag "${cohort}:${gene}:${key}"
+    tag "${cohort}:${gene}:${test_key}"
 
     label 'simple'
     label 'bamsignals'
@@ -7,16 +7,17 @@ process VISUALIZE {
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
     input:
-    tuple val(cohort), val(gene), val(key),
-          val(samples), path(coverage)
+    tuple val(cohort), val(gene),
+          val(test_key), path(test_cov),
+          val(ref_key), path(ref_coverage)
 
     output:
-    tuple val(cohort), val(gene), val(key),
-          path("${cohort}.${gene}.${key}.cov.png")
+    tuple val(cohort), val(gene), val(test_key),
+          path("${cohort}.${gene}.${test_key}.cov.png")
 
     script:
     """
     #!/bin/bash
-    visualize_bam.R ${cohort} ${gene} ${key} ${samples.join(',')} ${coverage.join(',')} ${cohort}.${gene}.${key}.cov.png
+    visualize_bam.R ${cohort} ${gene} ${test_key} ${test_cov} ${ref_key.join(',')} ${ref_coverage.join(',')} ${cohort}.${gene}.${test_key}.cov.png
     """
 }
