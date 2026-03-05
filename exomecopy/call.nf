@@ -15,6 +15,7 @@ process CALL {
     tuple val(cohort), val(gene), val(test_key), val("exomecopy"),
           path("${cohort}.${gene}.${test_key}.cnv.tsv"),
           path("${cohort}.${gene}.${test_key}.cnv.rds"),
+          path("${cohort}.${gene}.${test_key}.cnv.png"),
           env(nmarker)
 
     script:
