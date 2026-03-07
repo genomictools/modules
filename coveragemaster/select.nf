@@ -27,7 +27,7 @@ process SELECT {
 
     # prepare coverage files for cases and controls
     for i in ${depth} ${ref_depth.join(' ')}; do
-        out=\$(basename \${i} .${gene}.gene.bed)
+        out=\$(basename \${i} .${gene}.coverage.bed)
         cat \${i} | cut -f 1,2,5 > \${out}.cov
     done
     ls *.control.cov > ${cohort}.${key}.control_list.txt

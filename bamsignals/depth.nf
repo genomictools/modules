@@ -1,5 +1,5 @@
 process DEPTH {
-    tag "${cohort}:${key}:${type}:${gene}:${feature}"
+    tag "${cohort}:${key}:${type}:${gene}"
 
     label 'simple'
     label 'bamsignals'
@@ -9,15 +9,15 @@ process DEPTH {
     input:
     tuple val(cohort), val(key), val(type),
           path(bam), path(bai),
-          val(gene), val(feature), path(coords)
+          val(gene), path(gene_coords), path(exon_coords)
 
     output:
-    tuple val(cohort), val(key), val(type), val(gene), val(feature),
-          path("${cohort}.${key}.${type}.${gene}.${feature}.bed")
+    tuple val(cohort), val(key), val(type), val(gene), val('count,coverage'),
+          path("${cohort}.${key}.${type}.${gene}.{count,coverage}.bed")
 
     script:
     """
     #!/bin/bash
-    get_depth.R "${bam}" "${coords}" "${feature}" "${cohort}.${key}.${type}.${gene}.${feature}.bed"
+    get_depth.R "${bam}" "${gene_coords}" "${exon_coords}" "${cohort}.${key}.${type}.${gene}"
     """
 }
