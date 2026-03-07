@@ -18,6 +18,6 @@ process DEPTH {
     script:
     """
     #!/bin/bash
-    get_depth.R "${bam}" "${gene_coords}" "${exon_coords}" "${cohort}.${key}.${type}.${gene}"
+    get_depth.R "${bam}" "${gene_coords.join(',')}" "${exon_coords.join(',')}" "${cohort}.${key}.${type}.${gene}"
     """
 }

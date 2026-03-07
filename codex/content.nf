@@ -16,7 +16,7 @@ process CONTENT {
     script:
     """
     #!/bin/bash
-    get_content.R "${gene}" "${exon_coords}" "${params.genome}" "${params.style}"
+    get_content.R "${gene}" "${exon_coords.join(',')}" "${params.genome}" "${params.style}"
     """
 }
 
