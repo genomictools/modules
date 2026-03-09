@@ -1,20 +1,21 @@
-process CALL {
+process EXOMEDEPTH {
     tag "${cohort}:${gene}:${key}"
 
     label 'simple'
     label 'exomedepth'
 
-    publishDir("${params.output_dir}/calls/exomedepth/", mode: 'copy')
+    publishDir("${params.output_dir}/calls/${tool}/", mode: 'copy')
 
     input:
     tuple val(cohort), val(gene), val(key),
           path(test_counts),
-          path(ref_counts)
+            path(ref_counts),
+            val(tool)
 
     output:
-    tuple val(cohort), val(gene), val(key), val("exomedepth"),
+    tuple val(cohort), val(gene), val(key), val(tool),
           path("${cohort}.${gene}.${key}.cnv.tsv"),
-          path("${cohort}.${gene}.${key}.cnv.rds"),
+          path("${cohort}.${gene}.${key}.cnv.rds", optional: true),
           path("${cohort}.*.${key}.cnv.png", optional: true),
           env(nmarker)
 

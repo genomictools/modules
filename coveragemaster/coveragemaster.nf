@@ -1,25 +1,25 @@
-process CALL {
+process COVERAGEMASTER {
     tag "${cohort}:${gene}:${key}"
 
     label 'simple'
     label 'coveragemaster'
 
-    publishDir("${params.output_dir}/calls/coveragemaster", mode: 'copy')
+    publishDir("${params.output_dir}/calls/${tool}", mode: 'copy')
 
     input:
     tuple val(cohort), val(gene), val(key),
           path(depth), path(stats),
           path(ref_depth), path(ref_stats),
           path(ref_list), path(ref_aggregate),
-          path(gene_list)
+            path(gene_list),
+            val(tool)
 
     output:
-    tuple val(cohort), val(gene), val(key), val("coveragemaster"),
+    tuple val(cohort), val(gene), val(key), val(tool),
           path("${cohort}.${gene}.${key}.cnv.tsv"),
-          path("${cohort}.${gene}.${key}.CMcalls"),
-          path("${cohort}.${gene}.${key}.CMreport"),
-          path("${cohort}.${gene}.${key}.CMpositives.pdf"),
-          path("${cohort}.${gene}.${key}.CM.log")
+          path("${cohort}.${gene}.${key}.CMcalls", optional: true),
+          path("${cohort}.${gene}.${key}.CMpositives.pdf", optional: true),
+          env(nmarker)
 
     script:
     """
@@ -52,5 +52,7 @@ process CALL {
             }
         }
     ' ${cohort}.${gene}.${key}.CMcalls > ${cohort}.${gene}.${key}.cnv.tsv
+
+    nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.cnv.tsv || true)
     """
 }
