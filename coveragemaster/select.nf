@@ -18,7 +18,8 @@ process SELECT {
           path("${cohort}.*.control.cov"),
           path("${cohort}.*.control.report.txt"),
           path("${cohort}.${key}.control_list.txt"),
-          path("${cohort}.${key}.mean_sd.cov")
+          path("${cohort}.${key}.mean_sd.cov"),
+          path("${cohort}.${key}.gene_list.txt")
 
     script:
     """
@@ -43,5 +44,8 @@ process SELECT {
     awk -f ${projectDir}/bin/aggregate_cov.awk ${cohort}.${key}.control_list.txt ${cohort}.${key}.report_list.txt | \
         sort -k1,1 -k2,2n \
         > ${cohort}.${key}.mean_sd.cov
+
+    # prepare gene list
+    cat ${depth} | cut -f 4 | cut -d '-' -f 2 | sort -u >  ${cohort}.${key}.gene_list.txt
     """
 }
