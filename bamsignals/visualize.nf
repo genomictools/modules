@@ -7,9 +7,9 @@ process VISUALIZE {
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
     input:
-    tuple val(cohort), val(gene),
-          val(test_key), path(test_cov),
-          val(ref_key), path(ref_coverage)
+    tuple val(cohort), val(test_key), val(type), path(test_cov),
+          val(ref_key), path(ref_coverage),
+          val(gene)
 
     output:
     tuple val(cohort), val(gene), val(test_key),
