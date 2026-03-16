@@ -10,6 +10,7 @@ process EXOMECOPY {
     tuple val(cohort), val(gene),
           val(test_key), path(test_counts),
           val(ref_key), path(ref_counts),
+          path(gc), path(pmap),
           val(tool)
 
     output:
@@ -26,7 +27,7 @@ process EXOMECOPY {
     script:
     """
     #!/bin/bash
-    exomecopy.R ${cohort} ${gene} ${test_key} ${test_counts} ${ref_key.join(',')} ${ref_counts.join(',')} ${params.prob}
+    exomecopy.R ${cohort} ${gene} ${test_key} ${test_counts} ${ref_key.join(',')} ${ref_counts.join(',')} ${gc} ${pmap} ${params.prob}
 	export nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${test_key}.cnv.tsv || true)
     """
 }
