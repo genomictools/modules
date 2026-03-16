@@ -9,23 +9,24 @@ process EXOMEDEPTH {
     input:
     tuple val(cohort), val(gene), val(key),
           path(test_counts),
-            path(ref_counts),
-            val(tool)
+          path(ref_counts),
+          val(tool)
 
     output:
     tuple val(cohort), val(gene), val(key), val(tool),
           path("${cohort}.${gene}.${key}.cnv.tsv"),
-          path("${cohort}.${gene}.${key}.cnv.rds", optional: true),
-          path("${cohort}.*.${key}.cnv.png", optional: true),
-          env(nmarker)
+          env(nmarker), emit: calls, optional: true
+
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.${gene}.${key}.cnv.rds"), emit: rds, optional: true
+
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.*.${key}.cnv.png"), emit: plots, optional: true
 
     script:
     """
     #!/bin/bash
     exomedepth.R ${cohort} ${gene} ${key} ${test_counts} ${ref_counts.join(',')} ${params.prob}
-	if ! ls ${cohort}.*.${key}.cnv.png >/dev/null 2>&1; then
-	    touch ${cohort}.no_calls.${key}.cnv.png
-	fi
 	nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.cnv.tsv || true)
     """
 }
