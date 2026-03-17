@@ -16,14 +16,14 @@ process COVERAGEMASTER {
 
     output:
     tuple val(cohort), val(gene), val(key), val(tool),
-          path("${cohort}.${gene}.${key}.cnv.tsv"),
+          path("${cohort}.${gene}.${key}.${tool}.cnv.tsv"),
           env(nmarker), emit: calls, optional: true
 
     tuple val(cohort), val(gene), val(key), val(tool),
-          path("${cohort}.${gene}.${key}.CMcalls"), emit: CMcalls, optional: true
+          path("${cohort}.${gene}.${key}.${tool}.CMcalls"), emit: CMcalls, optional: true
 
     tuple val(cohort), val(gene), val(key), val(tool),
-          path("${cohort}.*.${key}.CMpositives.pdf"), emit: plots, optional: true
+          path("${cohort}.${gene}.${key}.${tool}.CMpositives.pdf"), emit: plots, optional: true
 
     script:
     """
@@ -36,12 +36,12 @@ process COVERAGEMASTER {
         -c ${ref_list} \
         -r ${ref_aggregate} \
         -n ${task.cpus} \
-        -o ${cohort}.${gene}.${key}
+        -o ${cohort}.${gene}.${key}.${tool}
 
-    awk -v cohort=${cohort} -v key=${key} '
+    awk -v cohort=${cohort} -v key=${key} -v tool=${tool} '
         BEGIN {
             OFS="\t"
-            print "seqnames","start","end","exon_start","exon_end","cn","cov","norm_cov","ratio","stats","cohort","key","gene"
+            print "seqnames","start","end","exon_start","exon_end","cn","cov","norm_cov","ratio","stats","cohort","key","gene","tool"
         }
         {
             if (\$0 ~ /NO COVERAGE/) {
@@ -51,12 +51,12 @@ process COVERAGEMASTER {
             line_gene = \$1
             for (i=1; i<=NF-4; i++) {
                 if (\$i ~ /^chr[0-9XYM]+\$/ && \$(i+1) ~ /^[0-9]+\$/ && \$(i+2) ~ /^[0-9]+\$/ && (\$(i+3)=="DUP" || \$(i+3)=="DEL") && \$(i+4) ~ /^[0-9]+\$/) {
-                    print \$i, \$(i+1), \$(i+2), "NA", "NA", (\$(i+3)=="DUP" ? 3 : 1), "NA", "NA", "NA", "NA", cohort, key, line_gene
+                    print \$i, \$(i+1), \$(i+2), "NA", "NA", (\$(i+3)=="DUP" ? 3 : 1), "NA", "NA", "NA", "NA", cohort, key, line_gene, tool
                 }
             }
         }
-    ' ${cohort}.${gene}.${key}.CMcalls > ${cohort}.${gene}.${key}.cnv.tsv
+    ' ${cohort}.${gene}.${key}.${tool}.CMcalls > ${cohort}.${gene}.${key}.${tool}.cnv.tsv
 
-    nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.cnv.tsv || true)
+    nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.${tool}.cnv.tsv || true)
     """
 }

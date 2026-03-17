@@ -1,5 +1,5 @@
 process EXOMECOPY {
-    tag "${cohort}:${gene}:${test_key}"
+    tag "${cohort}:${gene}:${key}"
 
     label 'simple'
     label 'exomecopy'
@@ -8,26 +8,26 @@ process EXOMECOPY {
 
     input:
     tuple val(cohort), val(gene),
-          val(test_key), path(test_counts),
+          val(key), path(test_counts),
           val(ref_key), path(ref_counts),
           path(gc), path(pmap),
           val(tool)
 
     output:
-    tuple val(cohort), val(gene), val(test_key), val(tool),
-          path("${cohort}.${gene}.${test_key}.cnv.tsv"),
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.${gene}.${key}.${tool}.cnv.tsv"),
           env(nmarker), emit: calls, optional: true
 
-    tuple val(cohort), val(gene), val(test_key), val(tool),
-          path("${cohort}.${gene}.${test_key}.cnv.rds"), emit: rds, optional: true
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.${gene}.${key}.${tool}.cnv.rds"), emit: rds, optional: true
 
-    tuple val(cohort), val(gene), val(test_key), val(tool),
-          path("${cohort}.*.${test_key}.cnv.png"), emit: plots, optional: true
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.*.${key}.${tool}.cnv.png"), emit: plots, optional: true
 
     script:
     """
     #!/bin/bash
-    exomecopy.R ${cohort} ${gene} ${test_key} ${test_counts} ${ref_key.join(',')} ${ref_counts.join(',')} ${gc} ${pmap} ${params.prob}
-	export nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${test_key}.cnv.tsv || true)
+    exomecopy.R ${cohort} ${gene} ${key} ${tool} ${test_counts} ${ref_key.join(',')} ${ref_counts.join(',')} ${gc} ${pmap} ${params.prob}
+	export nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.${tool}.cnv.tsv || true)
     """
 }

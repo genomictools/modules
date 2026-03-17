@@ -14,19 +14,19 @@ process EXOMEDEPTH {
 
     output:
     tuple val(cohort), val(gene), val(key), val(tool),
-          path("${cohort}.${gene}.${key}.cnv.tsv"),
+          path("${cohort}.${gene}.${key}.${tool}.cnv.tsv"),
           env(nmarker), emit: calls, optional: true
 
     tuple val(cohort), val(gene), val(key), val(tool),
-          path("${cohort}.${gene}.${key}.cnv.rds"), emit: rds, optional: true
+          path("${cohort}.${gene}.${key}.${tool}.cnv.rds"), emit: rds, optional: true
 
     tuple val(cohort), val(gene), val(key), val(tool),
-          path("${cohort}.*.${key}.cnv.png"), emit: plots, optional: true
+          path("${cohort}.*.${key}.${tool}.cnv.png"), emit: plots, optional: true
 
     script:
     """
     #!/bin/bash
-    exomedepth.R ${cohort} ${gene} ${key} ${test_counts} ${ref_counts.join(',')} ${params.prob}
-	nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.cnv.tsv || true)
+    exomedepth.R ${cohort} ${gene} ${key} ${tool} ${test_counts} ${ref_counts.join(',')} ${params.prob}
+	nmarker=\$(grep -vc '^#' ${cohort}.${gene}.${key}.${tool}.cnv.tsv || true)
     """
 }
