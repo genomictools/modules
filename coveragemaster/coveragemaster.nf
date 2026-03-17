@@ -11,15 +11,19 @@ process COVERAGEMASTER {
           path(depth), path(stats),
           path(ref_depth), path(ref_stats),
           path(ref_list), path(ref_aggregate),
-            path(gene_list),
-            val(tool)
+          path(gene_list),
+          val(tool)
 
     output:
     tuple val(cohort), val(gene), val(key), val(tool),
           path("${cohort}.${gene}.${key}.cnv.tsv"),
-          path("${cohort}.${gene}.${key}.CMcalls", optional: true),
-          path("${cohort}.${gene}.${key}.CMpositives.pdf", optional: true),
-          env(nmarker)
+          env(nmarker), emit: calls, optional: true
+
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.${gene}.${key}.CMcalls"), emit: CMcalls, optional: true
+
+    tuple val(cohort), val(gene), val(key), val(tool),
+          path("${cohort}.*.${key}.CMpositives.pdf"), emit: plots, optional: true
 
     script:
     """
