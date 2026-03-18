@@ -18,7 +18,7 @@ process CONSENSUS {
     script:
     """
     #!/bin/bash
-    create_consensus.R ${cnv.join(',')} ${params.cn} ${params.ratio} ${params.stats} ${cohort}.${gene}.consensus.tsv
+    create_consensus.R ${cnv.join(',')} ${params.cn} ${params.ratio} ${params.stats} "${params.style}" ${cohort}.${gene}.consensus.tsv
     nmarker=\$(grep -vc '^#' ${cohort}.${gene}.consensus.tsv || true)
     """
 }
