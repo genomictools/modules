@@ -7,7 +7,7 @@ process COORDINATES {
     publishDir("${params.output_dir}/coordinates", mode: 'copy')
 
     input:
-    val(gene)
+    tuple val(gene), path(genes_list)
 
     output:
     tuple val(gene), path("${gene}.gene.bed"), path("${gene}.exon.bed")
@@ -15,6 +15,6 @@ process COORDINATES {
     script:
     """
     #!/bin/bash
-    get_coordinates.R "${gene}" "${gene == 'reference' ? params.bins : 1 }" "${params.species}" "${params.genome}" "${params.style}"
+    get_coordinates.R "${gene}" "${genes_list}" "${gene == 'reference' ? params.bins : 1 }" "${params.species}" "${params.genome}" "${params.style}"
     """
 }
