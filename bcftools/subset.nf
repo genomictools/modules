@@ -21,19 +21,16 @@ process SUBSETMULTIVCF {
     """
     #!/bin/bash
     # Get sample names from pedigree file
-    # if family id is true, then use family_id_sample_id
-    # otherwise, use sample_id only
-    if [ ${params.family_id} ]; then
+    if [ "${params.family_id}" = "true" ]; then
         awk '{print \$1"_"\$2}' ${pedigree} > samples.txt
     else
         awk '{print \$2}' ${pedigree} > samples.txt
     fi
-    
     # Subset cohort
     bcftools view -R ${coordinates} -S samples.txt --force-samples ${file} | \
-    if [ ${params.normalize} ];      then bcftools norm -m -any; fi | \
-    if [ ${params.pass} ];           then bcftools view -i 'FILTER="PASS"'; fi | \
-    if [ ${params.missing_as_ref} ]; then bcftools +setGT -- -t . -n 0; fi | \
+    if [ "${params.normalize}" = "true" ];      then bcftools norm -m -any; fi | \
+    if [ "${params.pass}" = "true" ];           then bcftools view -i 'FILTER="PASS"'; fi | \
+    if [ "${params.missing_as_ref}" = "true" ]; then bcftools +setGT -- -t . -n 0; fi | \
     bcftools +fill-tags -- -t all | \
     bcftools view -g het --threads ${task.cpus} -Oz -o ${cohort}.${key}.subset.vcf.gz
 
