@@ -27,6 +27,7 @@ process CONVERT {
         --vcf ${file} \
         --make-bed \
         --pheno <(awk '{print \$1, \$2, \$6}' ${phenotype}) \
+        --double-id \
         --out ${cohort}.${key}.${category}
     """
 }
