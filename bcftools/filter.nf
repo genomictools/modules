@@ -16,6 +16,7 @@ process FILTER {
     tuple val(cohort), val(key), val(category),
           path("${cohort}.${key}.${category}.vcf.gz"),
           path("${cohort}.${key}.${category}.vcf.gz.tbi"),
+          path("${cohort}.${key}.${category}.variants.txt"),
           path("${cohort}.${key}.${category}.annotations.tsv"),
           path("${cohort}.${key}.${category}.qc.tsv"),
           env(n_samples), env(n_variants)
@@ -44,6 +45,12 @@ process FILTER {
     # Index the VCF
     tabix ${cohort}.${key}.${category}.vcf.gz
 
+    # Export variant list
+	bcftools query \
+		-f '%CHROM:%POS:%REF:%ALT\n' \
+		${cohort}.${key}.${category}.vcf.gz \
+		> ${cohort}.${key}.${category}.variants.txt
+
     # Extract annotations
     echo -e "variant\tgene\t\$(bcftools +split-vep -l ${cohort}.${key}.${category}.vcf.gz | cut -f 2 | tr '\n' '\t' | sed 's/\t\$//')" > ${cohort}.${key}.${category}.annotations.tsv
 	bcftools +split-vep \
@@ -53,7 +60,7 @@ process FILTER {
 		-d -A tab \
 		${cohort}.${key}.${category}.vcf.gz \
 		>> ${cohort}.${key}.${category}.annotations.tsv
-    
+
     # Extract allele depth
     bcftools query -f '[%CHROM:%POS:%REF:%ALT\t%SAMPLE\t%GT\t%AD\n]' \
     ${cohort}.${key}.${category}.vcf.gz \
