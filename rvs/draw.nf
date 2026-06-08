@@ -1,5 +1,5 @@
 process DRAW {
-    tag "${famid}:${category}:${gene}"
+    tag "${famid}:${gene}"
 
     label 'simple'
     label 'rvs'
@@ -7,17 +7,17 @@ process DRAW {
     publishDir("${params.output_dir}/plots", mode: 'copy')
 
     input:
-    tuple val(famid), val(category),
+    tuple val(famid),
           path(pedigree), path(affected), path(carrier), path(starred),
           val(gene), val(variant)
 
     output:
-    tuple val(famid), val(category), val(gene),
-          path("${famid}.${category}.${gene}.png")
+    tuple val(famid), val(gene),
+          path("${famid}.${gene}.png")
 
     script:
     """
     #!/bin/bash
-    draw.R ${famid} ${category} ${pedigree} ${affected} ${carrier} ${starred} ${gene} ${variant.join(',')}
+    draw.R ${famid} ${pedigree} ${affected} ${carrier} ${starred} ${gene} ${variant.join(',')}
     """
 }
