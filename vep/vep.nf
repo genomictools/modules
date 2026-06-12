@@ -17,9 +17,9 @@ process VEP {
 
     script:
     def args = []
-    if ( params.cadd )     { args << "--plugin CADD,snv=${params.cadd_snv},indels=${params.cadd_indel}" }
-    if ( params.spliceai ) { args << "--plugin SpliceAI,snv=${params.spliceai_snv},indel=${params.spliceai_indel}" }
-    if ( params.gnomad )   { args << "--custom ${params.gnomad_file},gnomAD,vcf,exact,0,AF" }
+    if ( params.cadd_snv     != null ) { args << "--plugin CADD,snv=${params.cadd_snv},indels=${params.cadd_indel}" }
+    if ( params.spliceai_snv != null ) { args << "--plugin SpliceAI,snv=${params.spliceai_snv},indel=${params.spliceai_indel}" }
+    if ( params.gnomad       != null ) { args << "--custom ${params.gnomad},gnomAD,vcf,exact,0,AF" }
     if ( params.species == 'human' )   { args << "--species homo_sapiens" } else { args << "--species ${params.species}" }
     def args_str = args.join(' ')
 
@@ -32,14 +32,14 @@ process VEP {
         --cache_version ${params.version} \
         --dir_cache ${params.vep_cache} \
         --fasta ${params.fasta} \
+        --fork ${task.cpus} \
         --cache \
         --offline \
         --everything \
         --format vcf \
         --vcf \
-        --compress_output bgzip \
-        --fork ${task.cpus} \
-        ${args_str}
+        --vcf_info_field vep \
+        --compress_output bgzip
 
     tabix ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz
 
