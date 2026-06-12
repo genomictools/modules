@@ -32,6 +32,7 @@ process VEP {
         --cache_version ${params.version} \
         --dir_cache ${params.vep_cache} \
         --fasta ${params.fasta} \
+        --vcf_info_field vep \
         --cache \
         --offline \
         --everything \
