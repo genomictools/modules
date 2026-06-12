@@ -32,13 +32,14 @@ process VEP {
         --cache_version ${params.version} \
         --dir_cache ${params.vep_cache} \
         --fasta ${params.fasta} \
+        --fork ${task.cpus} \
+        ${args_str} \
         --vcf_info_field vep \
         --cache \
         --offline \
         --everything \
         --format vcf \
         --vcf \
-        --vcf_info_field vep \
         --compress_output bgzip
 
     tabix ${params.assembly}.${tool}.${params.version}.${id}.vcf.gz
