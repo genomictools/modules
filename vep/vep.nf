@@ -19,8 +19,10 @@ process VEP {
     def args = []
     if ( params.cadd_snv     != null ) { args << "--plugin CADD,snv=${params.cadd_snv},indels=${params.cadd_indel}" }
     if ( params.spliceai_snv != null ) { args << "--plugin SpliceAI,snv=${params.spliceai_snv},indel=${params.spliceai_indel}" }
+    if ( params.human_ancestor != null ) { args << "--plugin LoF,human_ancestor_fa:${params.human_ancestor},filter_position:${params.filter_position},min_intron_size:${params.min_intron_size},conservation_file:${params.loftee_conserv},gerp_file:${params.loftee_gerp}" }
     if ( params.gnomad       != null ) { args << "--custom ${params.gnomad},gnomAD,vcf,exact,0,AF" }
     if ( params.species == 'human' )   { args << "--species homo_sapiens" } else { args << "--species ${params.species}" }
+
     def args_str = args.join(' ')
 
     """
