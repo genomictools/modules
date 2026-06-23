@@ -15,7 +15,7 @@ process ANNOTATE {
     output:
     tuple val(cohort), val(assembly), val(version),
           path("${cohort}.${assembly}.${version}.vcf.gz"),
-          path("${cohort}.${assembly}.${version}.vcf.gz.tbi"),
+        //   path("${cohort}.${assembly}.${version}.vcf.gz.tbi"),
           path("${cohort}.${assembly}.${version}.log")
 
     script:
@@ -35,7 +35,5 @@ process ANNOTATE {
         --output ${cohort}.${assembly}.${version}.vcf.gz \
         ${args_str} \
         2> ${cohort}.${assembly}.${version}.log
-
-    touch ${cohort}.${assembly}.${version}.vcf.gz.tbi
     """
 }
