@@ -25,7 +25,7 @@ process FILTER {
     """
     #!/bin/bash
     # Filter variants
-    bcftools view ${file} | \
+    bcftools view -i "AC >= ${params.AC}" ${file} | \
     if   [ "${params.remove_common}" = "true" ];      then bcftools view -e "MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}"; else bcftools view; fi | \
     if   [ "${params.remove_benign}" = "true" ];      then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'benign'"; else bcftools view; fi | \
     if   [ '${params.remove_conflicting}' = 'true' ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'conflicting'"; else bcftools view ; fi | \
