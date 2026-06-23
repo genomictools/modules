@@ -22,7 +22,7 @@ process FILTER {
     """
     #!/bin/bash
     # Filter variants
-    bcftools view ${file} | \
+    bcftools view -i "AC >= ${params.AC}" ${file} | \
     if   [ "${params.remove_benign}" = "true" ];      then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'benign'"; else bcftools view; fi | \
     if   [ '${params.remove_vus}' = 'true' ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'conflicting'"; else bcftools view ; fi | \
     if   [ '${params.remove_lc}' = 'true' ];  then bcftools +split-vep -a ${params.vep_tag} -s worst -c LoF -e "LoF = 'LC'"; else bcftools view ; fi | \
