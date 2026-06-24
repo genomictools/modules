@@ -26,9 +26,8 @@ process FILTER {
     if   [ "${params.remove_benign}" = "true" ];      then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'benign'"; else bcftools view; fi | \
     if   [ '${params.remove_vus}' = 'true' ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'conflicting'"; else bcftools view ; fi | \
     if   [ '${params.remove_lc}' = 'true' ];  then bcftools +split-vep -a ${params.vep_tag} -s worst -c LoF -e "LoF = 'LC'"; else bcftools view ; fi | \
-    if   [ "${params.freq_tag}" = "VEP"  ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c ${params.AF_COL}:Float -e "${params.AF_COL} > ${params.AF}";
-    elif [ "${params.freq_tag}" = "INFO" ]; then bcftools filter -e "${params.AF_COL} > ${params.AF}";
-    elif [ "${category}" = "Rare" ];       then bcftools view;
+    if   [ "${params.freq_tag}" = "VEP"  ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c ${params.AF_COL}:Float -e "${params.AF_COL} > ${params.AF}"; else bcftools filter -e "${params.AF_COL} > ${params.AF}" ; fi | \
+    if   [ "${category}" = "Rare" ];       then bcftools view;
     elif [ "${category}" = "Pathogenic" ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -i "CLIN_SIG ~ 'pathogenic' || CLIN_SIG ~ 'likely_pathogenic'";
     elif [ "${category}" = "High" ];       then bcftools +split-vep -a ${params.vep_tag} -s worst -c IMPACT,CADD_PHRED:Float -i "IMPACT='HIGH' && CADD_PHRED > ${params.CADD}";
     elif [ "${category}" = "Damaging" ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c IMPACT,CADD_PHRED:Float -i "(IMPACT='HIGH' || IMPACT='MODERATE') && CADD_PHRED > ${params.CADD}";
