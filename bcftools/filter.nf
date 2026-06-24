@@ -19,23 +19,59 @@ process FILTER {
           env(n_variants)
         
     script:
+    // Reliability filters
+    def clv_remove = (params.remove_benign || params.remove_vus) ? true : false
+    def any_remove = (params.remove_benign || params.remove_vus || params.remove_lc) ? true : false
+    def rel_cols = []
+    def rel_expr = []
+
+    if (clv_remove)             { rel_cols << "CLIN_SIG" }
+    if (params.remove_lc)       { rel_cols << "LoF" }
+    if (params.remove_benign)   { rel_expr << "CLIN_SIG ~ 'benign'" }
+    if (params.remove_vus)      { rel_expr << "CLIN_SIG ~ 'conflicting'" }
+    if (params.remove_lc)       { rel_expr << "LoF = 'LC'" }
+
+    def rel_cols_str = rel_cols.join(',')
+    def rel_expr_str = rel_expr.join(' || ')
+
+    // Category filters
+    def cat_cols = []
+    def cat_expr = []
+
+    if (category == "Rare") {
+        // No additional filters for Rare category
+    } else if (category == "Pathogenic") {
+        cat_cols << "CLIN_SIG"
+        cat_expr << "CLIN_SIG ~ 'pathogenic' || CLIN_SIG ~ 'likely_pathogenic'"
+    } else if (category == "High") {
+        cat_cols << "IMPACT,CADD_PHRED:Float"
+        cat_expr << "IMPACT='HIGH' && CADD_PHRED > ${params.CADD}"
+    } else if (category == "Damaging") {
+        cat_cols << "IMPACT,CADD_PHRED:Float"
+        cat_expr << "(IMPACT='HIGH' || IMPACT='MODERATE') && CADD_PHRED > ${params.CADD}"
+    } else if (category == "PTV") {
+        cat_cols << "Consequence"
+        cat_expr << "Consequence~'stop_gained' || Consequence~'frameshift_variant' || Consequence~'splice_acceptor_variant'"
+    } else if (category == "Stop") {
+        cat_cols << "Consequence"
+        cat_expr << "Consequence~'stop_gained'"
+    } else if (category == "Splicing") {
+        cat_cols << "SpliceAI_pred_DS_AG:Float,SpliceAI_pred_DS_AL:Float,SpliceAI_pred_DS_DG:Float,SpliceAI_pred_DS_DL:Float"
+        cat_expr << "SpliceAI_pred_DS_AG > ${params.DS} || SpliceAI_pred_DS_AL > ${params.DS} || SpliceAI_pred_DS_DG > ${params.DS} || SpliceAI_pred_DS_DL > ${params.DS}"
+    } else {
+        exit "Category: ${category} is not recognized"
+    }
+    def cat_cols_str = cat_cols.join(',')
+    def cat_expr_str = cat_expr.join(' || ')
+
     """
     #!/bin/bash
-    # Filter variants
-    bcftools view -i "${params.AC_COL} >= ${params.AC}" ${file} | \
-    if   [ "${params.remove_benign}" = "true" ];      then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'benign'"; else bcftools view; fi | \
-    if   [ '${params.remove_vus}' = 'true' ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -e "CLIN_SIG ~ 'conflicting'"; else bcftools view ; fi | \
-    if   [ '${params.remove_lc}' = 'true' ];  then bcftools +split-vep -a ${params.vep_tag} -s worst -c LoF -e "LoF = 'LC'"; else bcftools view ; fi | \
-    if   [ "${params.freq_tag}" = "VEP"  ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c ${params.AF_COL}:Float -e "${params.AF_COL} > ${params.AF}"; else bcftools filter -e "${params.AF_COL} > ${params.AF}" ; fi | \
-    if   [ "${category}" = "Rare" ];       then bcftools view;
-    elif [ "${category}" = "Pathogenic" ]; then bcftools +split-vep -a ${params.vep_tag} -s worst -c CLIN_SIG -i "CLIN_SIG ~ 'pathogenic' || CLIN_SIG ~ 'likely_pathogenic'";
-    elif [ "${category}" = "High" ];       then bcftools +split-vep -a ${params.vep_tag} -s worst -c IMPACT,CADD_PHRED:Float -i "IMPACT='HIGH' && CADD_PHRED > ${params.CADD}";
-    elif [ "${category}" = "Damaging" ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c IMPACT,CADD_PHRED:Float -i "(IMPACT='HIGH' || IMPACT='MODERATE') && CADD_PHRED > ${params.CADD}";
-    elif [ "${category}" = "PTV" ];        then bcftools +split-vep -a ${params.vep_tag} -s worst -c Consequence -i "Consequence~'stop_gained' || Consequence~'frameshift_variant' || Consequence~'splice_acceptor_variant'";
-    elif [ "${category}" = "Stop" ];       then bcftools +split-vep -a ${params.vep_tag} -s worst -c Consequence -i "Consequence~'stop_gained'";
-    elif [ "${category}" = "Splicing" ];   then bcftools +split-vep -a ${params.vep_tag} -s worst -c SpliceAI_pred_DS_AG:Float,SpliceAI_pred_DS_AL:Float,SpliceAI_pred_DS_DG:Float,SpliceAI_pred_DS_DL:Float -i "SpliceAI_pred_DS_AG > ${params.DS} || SpliceAI_pred_DS_AL > ${params.DS} || SpliceAI_pred_DS_DG > ${params.DS} || SpliceAI_pred_DS_DL > ${params.DS}";
-    elif [ "${category}" = "Unfiltered" ]; then bcftools view;
-    else exit "Category: ${category} is not recognized"; fi | \
+    # Apply the filters using bcftools
+    bcftools view ${file} | \
+    if   [ ${params.AC} > 0 ];              then bcftools view -i "${params.AC_COL} >= ${params.AC}"; fi | \
+    if   [ "${params.freq_tag}" = "VEP"  ]; then bcftools +split-vep -a "${params.vep_tag}" -s worst -c "${params.AF_COL}:Float" -e "${params.AF_COL} > ${params.AF}"; else bcftools filter -e "${params.AF_COL} > ${params.AF}" ; fi | \
+    if   [ "$any_remove" = "true" ];        then bcftools +split-vep -a "${params.vep_tag}" -s worst -c "$rel_cols_str" -e "$rel_expr_str"; else bcftools view; fi | \
+    if   [ "${category}" != "Rare" ];       then bcftools +split-vep -a "${params.vep_tag}" -s worst -c "$cat_cols_str" -i "$cat_expr_str"; else bcftools view; fi | \
     bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
     bcftools view --threads ${task.cpus} -Oz -o ${cohort}.${key}.${category}.vcf.gz
 
